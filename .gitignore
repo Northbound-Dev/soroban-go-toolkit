@@ -1,0 +1,19 @@
+# Binaries
+/sorobango
+/bin/
+/dist/
+
+# Test and coverage output
+*.test
+*.out
+coverage.txt
+coverage.html
+
+# Editor / OS cruft
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Internal build spec, deliberately not published
+PROJECT_SPEC.md

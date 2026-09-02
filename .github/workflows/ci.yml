@@ -1,0 +1,81 @@
+# Continuous integration for soroban-go-toolkit.
+#
+# Every check here runs offline: the client's tests mock the HTTP layer, so no
+# secrets, network access, or Stellar endpoint is required. The testnet example
+# under examples/ is compiled but deliberately never executed, since it makes
+# real network calls that would make CI flaky.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# The workflow only reads the repository.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          # Read from go.mod so the CI toolchain cannot drift from the module's
+          # declared version.
+          go-version-file: go.mod
+          cache: true
+
+      - name: Check formatting
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "The following files are not gofmt-clean:"
+            echo "$unformatted"
+            echo
+            echo "Run 'gofmt -w .' and commit the result."
+            exit 1
+          fi
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Build
+        run: go build ./...
+
+      # -race matters here because Client is documented as safe for concurrent
+      # use, and that claim should be tested rather than asserted.
+      - name: Test
+        run: go test -race ./...
+
+      - name: Check go.mod and go.sum are tidy
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      # Run with golangci-lint's default linter set (errcheck, govet,
+      # ineffassign, staticcheck, unused) rather than a checked-in config, so a
+      # contributor never has to reconcile a local config with the CI one.
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
