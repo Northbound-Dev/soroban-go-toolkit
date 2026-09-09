@@ -1,276 +1,160 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>soroban-go-toolkit - Go Client for Soroban Smart Contracts</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #fafafa;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        header {
-            background: linear-gradient(135deg, #0066ff, #0052cc);
-            color: white;
-            text-align: center;
-            padding: 60px 20px;
-            margin-bottom: 40px;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .badges {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin: 30px 0;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 20px;
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 40px 0;
-        }
-
-        .feature {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .feature h3 {
-            margin-bottom: 15px;
-            color: #0066ff;
-        }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: #e3f2fd;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 1.5rem;
-        }
-
-        .cta-section {
-            background: white;
-            padding: 60px 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            margin: 40px 0;
-        }
-
-        .cta-section h2 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .btn {
-            display: inline-block;
-            background: #0066ff;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 500;
-            margin: 0 10px;
-            transition: background 0.3s;
-        }
-
-        .btn:hover {
-            background: #0052cc;
-        }
-
-        .btn-secondary {
-            background: #e3f2fd;
-            color: #0066ff;
-            border: 1px solid #0066ff;
-        }
-
-        .btn-secondary:hover {
-            background: #bbdefb;
-        }
-
-        .code-example {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 5px;
-            font-family: 'Courier New', Courier, monospace;
-            overflow-x: auto;
-            margin: 20px 0;
-            border-left: 4px solid #0066ff;
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-            border-top: 1px solid #eee;
-            margin-top: 60px;
-        }
-
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 40px 0;
-            flex-wrap: wrap;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #0066ff;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 1rem;
-            color: #666;
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2rem;
-            }
-
-            header p {
-                font-size: 1rem;
-            }
-
-            .features {
-                grid-template-columns: 1fr;
-            }
-
-            .stats {
-                flex-direction: column;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>soroban-go-toolkit - Go Client for Soroban Smart Contracts</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Heroicons for SVG icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/heroicons/2.0.18/heroicons.min.css" rel="stylesheet">
+  <script>
+    // Dark mode toggle
+    document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
+    // Optionally store preference in localStorage
+  </script>
+  <style>
+    /* Custom animations and gradients */
+    .hero-gradient {
+      @apply bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-400;
+    }
+    .feature-card {
+      @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl;
+    }
+    .btn-primary {
+      @apply bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3 rounded-lg transition-shadow duration-300 hover:shadow-lg;
+    }
+    .btn-secondary {
+      @apply bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-medium px-6 py-3 rounded-lg border border-indigo-200 hover:border-indigo-300 transition-shadow duration-300 hover:shadow-md;
+    }
+    .stat-number {
+      @apply text-4xl font-bold text-indigo-600 dark:text-indigo-400;
+    }
+  </style>
 </head>
-<body>
-    <header>
-        <div class="container">
-            <h1>soroban-go-toolkit</h1>
-            <p>A Go client library and CLI for reading Soroban smart contract state on the Stellar network</p>
-            <div class="badges">
-                <span class="badge">MIT License</span>
-                <span class="badge">Go 1.24+</span>
-                <span class="badge">CI Tested</span>
-                <span class="badge">Stellar Ecosystem</span>
-            </div>
-        </div>
-    </header>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300.2">
+  <!-- Header -->
+  <header class="hero-gradient text-white py-20">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">soroban-go-toolkit</h1>
+      <p class="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
+        A Go client library and CLI for reading Soroban smart contract state on the Stellar network
+      </p>
+      <div class="flex flex-wrap justify-center gap-3 mt-6">
+        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">MIT License</span>
+        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Go 1.24+</span>
+        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">CI Tested</span>
+        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Stellar Ecosystem</span>
+      </div>
+    </div>
+  </header>
 
-    <section class="container">
-        <div class="stats">
-            <div class="stat">
-                <span class="stat-number">4</span>
-                <div class="stat-label">Core RPC Methods</div>
-            </div>
-            <div class="stat">
-                <span class="stat-number">100%</span>
-                <div class="stat-label">Test Covered</div>
-            </div>
-            <div class="stat">
-                <span class="stat-number">0</span>
-                <div class="stat-label">External Deps</div>
-            </div>
-        </div>
+  <main class="container mx-auto px-4 py-12">
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div class="text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <div class="stat-number">4</div>
+        <div class="stat-label text-sm text-gray-500 dark:text-gray-400">Core RPC Methods</div>
+      </div>
+      <div class="text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <div class="stat-number">100%</div>
+        <div class="stat-label text-sm text-gray-500 dark:text-gray-400">Test Covered</div>
+      </div>
+      <div class="text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <div class="stat-number">0</div>
+        <div class="stat-label text-sm text-gray-500 dark:text-gray-400">External Deps</div>
+      </div>
+    </div>
 
-        <h2>Why soroban-go-toolkit?</h2>
-        <p>Most existing Soroban tooling targets Rust (<code>rs-soroban-sdk</code>) and JavaScript/TypeScript (<code>js-stellar-sdk</code>, <code>soroban-react</code>). Go is where a lot of backend infrastructure actually lives — indexers, bots, monitoring, internal services — and Go developers reaching for Soroban have had to hand-roll JSON-RPC calls and wrestle XDR themselves.</p>
-        <p>This project fills that gap with idiomatic, typed Go bindings for the Stellar Soroban RPC API.</p>
+    <!-- Why Section -->
+    <section class="mb-16">
+      <h2 class="text-3xl font-bold mb-6 text-center">Why soroban-go-toolkit?</h2>
+      <p class="text-lg text-center max-w-3xl mx-auto text-gray-600 dark:text-gray-300 mb-8">
+        Most existing Soroban tooling targets Rust (<code class="bg-gray-200 dark:bg-gray-700 px-1 rounded">rs-soroban-sdk</code>) and JavaScript/TypeScript (<code class="bg-gray-200 dark:bg-gray-700 px-1 rounded">js-stellar-sdk</code>, <code class="bg-gray-200 dark:bg-gray-700 px-1 rounded">soroban-react</code>). Go is where a lot of backend infrastructure actually lives — indexers, bots, monitoring, internal services — and Go developers reaching for Soroban have had to hand-roll JSON-RPC calls and wrestle XDR themselves.
+      </p>
+      <p class="text-lg text-center max-w-3xl mx-auto text-gray-600 dark:text-gray-300">
+        This project fills that gap with idiomatic, typed Go bindings for the Stellar Soroban RPC API.
+      </p>
+    </section>
 
-        <div class="features">
-            <div class="feature">
-                <div class="feature-icon">🚀</div>
-                <h3>Complete RPC Client</h3>
-                <p>Typed request/response structs for getHealth, getLatestLedger, getContractData, and simulateTransaction with proper error handling.</p>
-            </div>
-
-            <div class="feature">
-                <div class="feature-icon">💻</div>
-                <h3>Ready-to-Use CLI</h3>
-                <p>Command-line interface wrapping all client functionality for easy scripting and automation.</p>
-            </div>
-
-            <div class="feature">
-                <div class="feature-icon">📚</div>
-                <div class="feature-icon">📖</div>
-                <h3>Working Examples</h3>
-                <p>Copy-pasteable quickstart examples that run against public Stellar testnet with zero configuration.</p>
-            </div>
-
-            <div class="feature">
-                <div class="feature-icon">🔧</div>
-                <h3>Production Ready</h3>
-                <p>MIT licensed, well-tested, CI validated, and designed for backend services and infrastructure.</p>
-            </div>
-        </div>
-
-        <div class="cta-section">
-            <h2>Get Started in Seconds</h2>
-            <div class="code-example">
-go get github.com/Northbound-Dev/soroban-go-toolkit
-            </div>
-            <p>Or install the CLI:</p>
-            <div class="code-example">
-go install github.com/Northbound-Dev/soroban-go-toolkit/cmd/sorobango@latest
-            </div>
-            <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" class="btn">View on GitHub</a>
-            <a href="#installation" class="btn btn-secondary">Installation Guide</a>
+    <!-- Features -->
+    <section class="mb-16">
+      <h2 class="text-3xl font-bold mb-8 text-center">Features</h2>
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <!-- Complete RPC Client -->
+        <div class="feature-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex flex-col h-full">
+          <div class="flex items-center justify-center w-12 h-12 mb-4 bg-indigo-100 dark:bg-indigo-900 rounded-full">
+            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3 text-indigo-600 dark:text-indigo-400">Complete RPC Client</h3>
+          <p class="flex-1 text-gray-600 dark:text-gray-300">
+            Typed request/response structs for getHealth, getLatestLedger, getContractData, and simulateTransaction with proper error handling.
+          </p>
         </div>
 
-        <h2>Quick Start Example</h2>
-        <div class="code-example">
-package main
+        <!-- Ready-to-Use CLI -->
+        <div class="feature-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex flex-col h-full">
+          <div class="flex items-center justify-center w-12 h-12 mb-4 bg-indigo-100 dark:bg-indigo-900 rounded-full">
+            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3 text-indigo-600 dark:text-indigo-400">Ready-to-Use CLI</h3>
+          <p class="flex-1 text-gray-600 dark:text-gray-300">
+            Command-line interface wrapping all client functionality for easy scripting and automation.
+          </p>
+        </div>
+
+        <!-- Working Examples -->
+        <div class="feature-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex flex-col h-full">
+          <div class="flex items-center justify-center w-12 h-12 mb-4 bg-indigo-100 dark:bg-indigo-900 rounded-full">
+            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m2 0a2 2 0 100-4 2 2 0 000 4zm-9 3a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4zm4-6a2 2 0 100-4 2 2 0 000 4z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3 text-indigo-600 dark:text-indigo-400">Working Examples</h3>
+          <p class="flex-1 text-gray-600 dark:text-gray-300">
+            Copy-pasteable quickstart examples that run against public Stellar testnet with zero configuration.
+          </p>
+        </div>
+
+        <!-- Production Ready -->
+        <div class="feature-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex flex-col h-full">
+          <div class="flex items-center justify-center w-12 h-12 mb-4 bg-indigo-100 dark:bg-indigo-900 rounded-full">
+            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 011.946.806 3.42 3.42 0 003.142 1.825A5.403 5.403 0 019.75 9.75v-.086A5.41 5.41 0 009 8.256a5.41 5.41 0 00-3.757 2.565 3.42 3.42 0 003.142-1.825A3.42 3.42 0 015.256 6.33a3.42 3.42 0 00-.806-1.946z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold mb-3 text-indigo-600 dark:text-indigo-400">Production Ready</h3>
+          <p class="flex-1 text-gray-600 dark:text-gray-300">
+            MIT licensed, well-tested, CI validated, and designed for backend services and infrastructure.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="text-center mb-16">
+      <h2 class="text-3xl font-bold mb-6">Get Started in Seconds</h2>
+      <div class="space-y-4 max-w-xl mx-auto">
+        <div class="flex flex-col gap-2">
+          <span class="text-sm text-gray-500 dark:text-gray-400">go get</span>
+          <code class="bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg text-left w-full block">go get github.com/Northbound-Dev/soroban-go-toolkit</code>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-sm text-gray-500 dark:text-gray-400">or install CLI</span>
+          <code class="bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg text-left w-full block">go install github.com/Northbound-Dev/soroban-go-toolkit/cmd/sorobango@latest</code>
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row justify-center gap-4 mt-6">
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" class="btn-primary px-8 py-3">
+          View on GitHub
+        </a>
+        <a href="#installation" class="btn-secondary px-8 py-3">
+          Installation Guide
+        </a>
+      </div>
+    </section>
+
+    <!-- Quick Start Example -->
+    <section class="mb-16">
+      <h2 class="text-3xl font-bold mb-6 text-center">Quick Start Example</h2>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 overflow-x-auto">
+        <pre class="text-sm text-gray-800 dark:text-gray-100"><code>package main
 
 import (
 	"context"
@@ -300,65 +184,85 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf("latest ledger:  %d (protocol %d)\n", ledger.Sequence, ledger.ProtocolVersion)
-}
-        </div>
-
-        <h2>Supported RPC Methods</h2>
-        <table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <thead>
-                <tr style="background: #0066ff; color: white;">
-                    <th style="padding: 12px; text-align: left;">Stellar RPC Method</th>
-                    <th style="padding: 12px; text-align: left;">Client Method</th>
-                    <th style="padding: 12px; text-align: left;">CLI Command</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 12px;">getHealth</td>
-                    <td style="padding: 12px;">GetHealth</td>
-                    <td style="padding: 12px;">sorobango health</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #eee; background: #f9f9f9;">
-                    <td style="padding: 12px;">getLatestLedger</td>
-                    <td style="padding: 12px;">GetLatestLedger</td>
-                    <td style="padding: 12px;">sorobango latest-ledger</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 12px;">getLedgerEntries</td>
-                    <td style="padding: 12px;">GetLedgerEntries</td>
-                    <td style="padding: 12px;">sorobango ledger-entries</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #eee; background: #f9f9f9;">
-                    <td style="padding: 12px;">simulateTransaction</td>
-                    <td style="padding: 12px;">SimulateTransaction</td>
-                    <td style="padding: 12px;">sorobango simulate</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 12px;">GetContractData*</td>
-                    <td style="padding: 12px;">GetContractData</td>
-                    <td style="padding: 12px;">sorobango contract-data</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #eee; background: #f9f9f9;">
-                    <td style="padding: 12px;">GetContractInstance*</td>
-                    <td style="padding: 12px;">GetContractInstance</td>
-                    <td style="padding: 12px;">sorobango contract-instance</td>
-                </tr>
-            </tbody>
-        </table>
-        <p><em>*Helper methods built on top of getLedgerEntries for easier contract state reading</em></p>
-
-        <h2>Join the Stellar Ecosystem</h2>
-        <p>soroban-go-toolkit is part of the growing Stellar ecosystem, enabling Go developers to build powerful backend services, indexers, and infrastructure on the Soroban smart contract platform.</p>
-        <div style="text-align: center; margin: 40px 0;">
-            <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" class="btn" style="padding: 16px 40px; font-size: 1.1rem;">Star on GitHub →</a>
-        </div>
+}</code></pre>
+      </div>
     </section>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 soroban-go-toolkit. Licensed under <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/blob/main/LICENSE" style="color: #0066ff; text-decoration: none;">MIT License</a>.</p>
-            <p>Part of the <a href="https://stellar.org" style="color: #0066ff; text-decoration: none;">Stellar Ecosystem</a> | <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/issues" style="color: #0066ff; text-decoration: none;">Issues</a> | <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/discussions" style="color: #0066ff; text-decoration: none;">Discussions</a></p>
-        </div>
-    </footer>
+    <!-- Supported RPC Methods -->
+    <section class="mb-16">
+      <h2 class="text-3xl font-bold mb-6 text-center">Supported RPC Methods</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
+          <thead class="bg-indigo-50 dark:bg-indigo-900">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Stellar RPC Method</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Client Method</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">CLI Command</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">getHealth</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">GetHealth</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">sorobango health</td>
+            </tr>
+            <tr class="bg-gray-50 dark:bg-gray-700">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">getLatestLedger</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">GetLatestLedger</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">sorobango latest-ledger</td>
+            </tr>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">getLedgerEntries</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">GetLedgerEntries</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">sorobango ledger-entries</td>
+            </tr>
+            <tr class="bg-gray-50 dark:bg-gray-700">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">simulateTransaction</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">SimulateTransaction</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">sorobango simulate</td>
+            </tr>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">GetContractData*</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">GetContractData</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">sorobango contract-data</td>
+            </tr>
+            <tr class="bg-gray-50 dark:bg-gray-700">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">GetContractInstance*</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">GetContractInstance</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-100">sorobango contract-instance</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="mt-4 text-sm text-center text-gray-500 dark:text-gray-400">
+          <em>*Helper methods built on top of getLedgerEntries for easier contract state reading</em>
+        </p>
+      </div>
+    </section>
+
+    <!-- Join Stellar Ecosystem -->
+    <section class="text-center">
+      <h2 class="text-3xl font-bold mb-6">Join the Stellar Ecosystem</h2>
+      <p class="text-lg max-w-2xl mx-auto text-gray-600 dark:text-gray-300">
+        soroban-go-toolkit is part of the growing Stellar ecosystem, enabling Go developers to build powerful backend services, indexers, and infrastructure on the Soroban smart contract platform.
+      </p>
+      <div class="mt-8">
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" class="btn-primary px-8 py-3">
+          Star on GitHub →
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-200 dark:border-gray-700">
+    <div class="container mx-auto px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+      <p>&copy; 2026 soroban-go-toolkit. Licensed under <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/blob/main/LICENSE" class="text-indigo-600 dark:text-indigo-400 hover:underline">MIT License</a>.</p>
+      <p class="mt-2">
+        Part of the <a href="https://stellar.org" class="text-indigo-600 dark:text-indigo-400 hover:underline">Stellar Ecosystem</a> |
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/issues" class="text-indigo-600 dark:text-indigo-400 hover:underline">Issues</a> |
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/discussions" class="text-indigo-600 dark:text-indigo-400 hover:underline">Discussions</a>
+      </p>
+    </div>
+  </footer>
 </body>
 </html>
