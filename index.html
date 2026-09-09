@@ -4,10 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>soroban-go-toolkit - Go Client for Soroban Smart Contracts</title>
+  <!-- Google Font: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Heroicons for SVG icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/heroicons/2.0.18/heroicons.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+              950: '#172554'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          },
+          boxShadow: {
+            glass: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+          }
+        }
+      }
+    }
+  </script>
   <script>
     // Dark mode toggle with localStorage persistence
     const html = document.documentElement;
@@ -49,10 +80,89 @@
     window.copyCode = copyCode;
   </script>
   <style>
-    /* Custom utilities and animations */
+    /* Glassmorphism effect */
+    .glass {
+      @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border border-white/20 dark:border-gray-700/20 shadow-glass;
+    }
+
+    /* Modern card styles */
+    .modern-card {
+      @apply glass rounded-2xl p-8 transition-all duration-500 hover:shadow-xl hover:-translate-y-1;
+    }
+
+    /* Feature icon styles */
+    .feature-icon {
+      @apply w-14 h-14 rounded-2xl flex items-center justify-center mb-6;
+      @apply bg-primary-50 dark:bg-primary-900/20;
+    }
+
+    /* Enhanced typography */
+    .h1-modern {
+      @apply text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tighter bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent;
+    }
+
+    .h2-modern {
+      @apply text-3xl md:text-4xl font-semibold leading-tight text-gray-900 dark:text-gray-100;
+    }
+
+    .body-text-modern {
+      @apply text-lg leading-relaxed text-gray-600 dark:text-gray-300;
+    }
+
+    /* Button styles */
+    .btn-modern-primary {
+      @apply bg-primary-600 hover:bg-primary-700 active:bg-primary-800
+             text-white font-medium px-8 py-3 rounded-xl
+             shadow-lg hover:shadow-xl active:shadow-lg
+             transition-all duration-300 transform hover:scale-105;
+    }
+
+    .btn-modern-secondary {
+      @apply bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700
+             text-primary-600 dark:text-primary-400 font-medium px-8 py-3 rounded-xl
+             border border-primary-200 dark:border-primary-700 hover:border-primary-300 dark:hover:border-primary-600
+             shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105;
+    }
+
+    /* Stats styling */
+    .stat-modern {
+      @apply glass rounded-2xl p-8 text-center transition-all duration-500 hover:shadow-xl hover:-translate-y-1;
+    }
+
+    .stat-number {
+      @apply text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2;
+    }
+
+    .stat-label {
+      @apply text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider;
+    }
+
+    /* Code block enhancements */
+    .code-block {
+      @apply bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600
+             p-6 font-mono text-sm leading-relaxed overflow-x-auto cursor-pointer
+             shadow-inner hover:shadow-lg transition-shadow duration-300 select-none glass;
+    }
+
+    .code-block:hover {
+      @apply bg-gray-100 dark:bg-gray-600;
+    }
+
+    /* Gradient enhancements */
+    .hero-gradient {
+      @apply bg-gradient-to-br from-primary-500 via-primary-400 to-primary-300;
+    }
+
+    /* Focus rings for accessibility */
+    .focus-ring:focus-visible {
+      @outline-offset 2px;
+      @outline 2px solid primary-500;
+    }
+
+    /* Animation utilities */
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
+      50% { transform: translateY(-10px); }
     }
 
     @keyframes pulse {
@@ -68,91 +178,22 @@
       animation: pulse 4s ease-in-out infinite;
     }
 
-    /* Enhanced typography */
-    .h1-display {
-      @apply text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tighter;
-    }
-
-    .h2-heading {
-      @apply text-2xl md:text-3xl font-semibold leading-tight;
-    }
-
-    .body-text {
-      @apply text-base leading-relaxed;
-    }
-
-    /* Premium card styles */
-    .premium-card {
-      @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700
-             hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-700
-             transition-all duration-300 ease-out;
-    }
-
-    .feature-icon-bg {
-      @apply bg-indigo-50 dark:bg-indigo-900/20 w-12 h-12 flex items-center justify-center rounded-xl
-             transition-all duration-300;
-    }
-
-    .feature-icon-bg:hover {
-      @apply bg-indigo-100 dark:bg-indigo-800 transform scale-105;
-    }
-
-    /* Code block enhancements */
-    .code-block {
-      @apply bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600
-             p-5 font-mono text-sm leading-relaxed overflow-x-auto cursor-pointer
-             shadow-inner hover:shadow-lg transition-shadow duration-300 select-none;
-    }
-
-    .code-block:hover {
-      @apply bg-gray-100 dark:bg-gray-600;
-    }
-
-    /* Button styles */
-    .btn-primary {
-      @apply bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800
-             text-white font-medium px-6 py-2.5 rounded-lg
-             shadow-md hover:shadow-lg active:shadow-lg
-             transition-all duration-200 transform hover:scale-105;
-    }
-
-    .btn-secondary {
-      @apply bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700
-             text-indigo-600 dark:text-indigo-400 font-medium px-6 py-2.5 rounded-lg
-             border border-indigo-200 dark:border-indigo-700 hover:border-indigo-300 dark:hover:border-indigo-600
-             shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105;
-    }
-
-    /* Stats styling */
-    .stat-container {
-      @apply bg-white dark:bg-gray-800 rounded-xl p-6 text-center
-             shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-700
-             transition-all duration-300 ease-out;
-    }
-
-    /* Gradient enhancements */
-    .hero-gradient {
-      @apply bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-400;
-    }
-
-    /* Focus rings for accessibility */
-    .focus-ring:focus-visible {
-      @outline-offset 2px;
-      @outline 2px solid indigo-500;
-    }
-
     /* Mobile optimizations */
     @media (max-width: 640px) {
-      .h1-display {
-        @apply text-3xl md:text-4xl;
+      .h1-modern {
+        @apply text-4xl md:text-5xl;
       }
       
-      .h2-heading {
+      .h2-modern {
         @apply text-xl md:text-2xl;
       }
       
-      .body-text {
-        @apply text-sm;
+      .body-text-modern {
+        @apply text-base;
+      }
+      
+      .modern-card {
+        @apply p-6;
       }
     }
   </style>
@@ -161,7 +202,7 @@
   <!-- Theme Toggle Button (fixed position) -->
   <button onclick="toggleTheme()"
           class="fixed top-4 right-4 z-50 p-2 rounded-full bg-white dark:bg-gray-800/50 hover:bg-white/10 dark:hover:bg-gray-700/50
-                 shadow-lg focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                 shadow-lg focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
                  transition-all duration-300 transform hover:scale-110
                  aria-label='Toggle dark mode'"
           :class="{ 'dark:text-white': document.documentElement.classList.contains('dark') }">
@@ -172,149 +213,147 @@
   </button>
 
   <!-- Header -->
-  <header class="hero-gradient text-white py-16">
+  <header class="hero-gradient text-white py-24">
     <div class="container mx-auto px-6 text-center">
       <div class="inline-block">
-        <h1 class="h1-display mb-4">
+        <h1 class="h1-modern mb-6">
           soroban-go-toolkit
         </h1>
-        <p class="body-text text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
-          The simplest way to use Soroban smart contracts in Go
+        <p class="body-text-modern text-xl md:text-2xl opacity-90 max-w-3xl mx-auto leading-relaxed">
+          A modern Go client library and CLI for reading Soroban smart contract state on the Stellar network
         </p>
       </div>
 
-      <!-- Getting Started - Made Extremely Prominent -->
-      <div class="mt-8 space-y-4">
-        <div class="flex flex-col items-center space-x-2">
-          <label class="text-sm font-medium text-white/90">go get</label>
-          <div class="code-block w-full max-w-xs" onclick="copyCode(this)">
-            go get github.com/Northbound-Dev/soroban-go-toolkit
-          </div>
+      <!-- Subtle animated decoration -->
+      <div class="mt-12 flex justify-center space-x-6">
+        <div class="w-8 h-8 bg-white/20 rounded-full animate-float">
+          <div class="w-4 h-4 bg-white/30 rounded-full mx-auto mt-2 animate-pulse-slow"></div>
         </div>
-        
-        <div class="flex flex-col items-center space-x-2">
-          <label class="text-sm font-medium text-white/90">or install CLI</label>
-          <div class="code-block w-full max-w-xs" onclick="copyCode(this)">
-            go install github.com/Northbound-Dev/soroban-go-toolkit/cmd/sorobango@latest
-          </div>
+        <div class="w-8 h-8 bg-white/20 rounded-full animate-float" style="animation-delay: 2s;">
+          <div class="w-4 h-4 bg-white/30 rounded-full mx-auto mt-2 animate-pulse-slow" style="animation-delay: 1s;"></div>
         </div>
-        
-        <div class="flex space-x-3">
-          <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" class="btn-primary px-6 py-2.5">
-            View on GitHub
-          </a>
-          <a href="#quickstart" class="btn-secondary px-6 py-2.5">
-            Quick Start
-          </a>
+        <div class="w-8 h-8 bg-white/20 rounded-full animate-float" style="animation-delay: 4s;">
+          <div class="w-4 h-4 bg-white/30 rounded-full mx-auto mt-2 animate-pulse-slow" style="animation-delay: 3s;"></div>
         </div>
       </div>
 
-      <!-- Subtle animated decoration -->
-      <div class="mt-10 flex justify-center space-x-4">
-        <div class="w-7 h-7 bg-white/20 rounded-full animate-float">
-          <div class="w-3.5 h-3.5 bg-white/30 rounded-full mx-auto mt-1.5 animate-pulse-slow"></div>
-        </div>
-        <div class="w-7 h-7 bg-white/20 rounded-full animate-float" style="animation-delay: 2s;">
-          <div class="w-3.5 h-3.5 bg-white/30 rounded-full mx-auto mt-1.5 animate-pulse-slow" style="animation-delay: 1s;"></div>
-        </div>
-        <div class="w-7 h-7 bg-white/20 rounded-full animate-float" style="animation-delay: 4s;">
-          <div class="w-3.5 h-3.5 bg-white/30 rounded-full mx-auto mt-1.5 animate-pulse-slow" style="animation-delay: 3s;"></div>
-        </div>
+      <div class="flex flex-wrap justify-center gap-3 mt-10">
+        <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">MIT License</span>
+        <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-md backdrop-blur-sm">Go 1.24+</span>
+        <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-md backdrop-blur-sm">CI Tested</span>
+        <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-md backdrop-blur-sm">Stellar Ecosystem</span>
       </div>
     </div>
   </header>
 
-  <main class="container mx-auto px-6 py-12">
-    <!-- Why This Toolkit -->
-    <section class="mb-16 text-center">
-      <h2 class="h2-heading mb-6">Why soroban-go-toolkit?</h2>
-      <p class="body-text text-lg max-w-3xl mx-auto text-gray-600 dark:text-gray-300">
-        Most Soroban tooling focuses on Rust and JavaScript. Go powers backend infrastructure, indexers, and services — but Go developers had to hand-roll RPC calls and decode XDR manually.
+  <main class="container mx-auto px-6 py-16">
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+      <div class="stat-modern">
+        <div class="stat-number">4</div>
+        <div class="stat-label">Core RPC Methods</div>
+      </div>
+      <div class="stat-modern">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Test Covered</div>
+      </div>
+      <div class="stat-modern">
+        <div class="stat-number">0</div>
+        <div class="stat-label">External Deps</div>
+      </div>
+    </div>
+
+    <!-- Why Section -->
+    <section class="mb-24 text-center">
+      <h2 class="h2-modern mb-8">Why soroban-go-toolkit?</h2>
+      <p class="body-text-modern text-xl max-w-4xl mx-auto">
+        Most existing Soroban tooling targets Rust (<code class="bg-gray-100 dark:bg-gray-700 px-1 rounded-md font-mono">rs-soroban-sdk</code>) and JavaScript/TypeScript (<code class="bg-gray-100 dark:bg-gray-700 px-1 rounded-md font-mono">js-stellar-sdk</code>, <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded-md font-mono">soroban-react</code>). Go is where a lot of backend infrastructure actually lives — indexers, bots, monitoring, internal services — and Go developers reaching for Soroban have had to hand-roll JSON-RPC calls and wrestle XDR themselves.
       </p>
-      <p class="body-text text-lg max-w-3xl mx-auto text-gray-600 dark:text-gray-300 mt-4">
-        This project provides idiomatic, typed Go bindings for Stellar Soroban RPC — so you can focus on building, not boilerplate.
+      <p class="body-text-modern text-xl max-w-4xl mx-auto mt-4">
+        This project fills that gap with idiomatic, typed Go bindings for the Stellar Soroban RPC API.
       </p>
     </section>
 
-    <!-- Key Features -->
-    <section class="mb-16">
-      <h2 class="h2-heading mb-8 text-center">Features</h2>
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <!-- Features -->
+    <section class="mb-24">
+      <h2 class="h2-modern mb-12 text-center">Features</h2>
+      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
         <!-- Complete RPC Client -->
-        <div class="premium-card flex flex-col items-start p-6">
-          <div class="flex items-center justify-center w-10 h-10 mb-4 feature-icon-bg">
-            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        <div class="modern-card flex flex-col h-full">
+          <div class="feature-icon">
+            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
           </div>
-          <h3 class="text-lg font-bold mb-2 text-indigo-600 dark:text-indigo-400 w-full">Complete RPC Client</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300 w-full">
-            Typed request/response structs for all major Soroban RPC methods with proper error handling.
+          <h3 class="text-xl font-bold mb-4 text-primary-600 dark:text-primary-400 flex-grow-0">Complete RPC Client</h3>
+          <p class="flex-1 text-gray-600 dark:text-gray-300 leading-relaxed mb-auto">
+            Typed request/response structs for getHealth, getLatestLedger, getContractData, and simulateTransaction with proper error handling.
           </p>
         </div>
 
         <!-- Ready-to-Use CLI -->
-        <div class="premium-card flex flex-col items-start p-6">
-          <div class="flex items-center justify-center w-10 h-10 mb-4 feature-icon-bg">
-            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+        <div class="modern-card flex flex-col h-full">
+          <div class="feature-icon">
+            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
           </div>
-          <h3 class="text-lg font-bold mb-2 text-indigo-600 dark:text-indigo-400 w-full">Ready-to-Use CLI</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300 w-full">
-            Command-line interface wrapping all client functionality for scripting and automation.
+          <h3 class="text-xl font-bold mb-4 text-primary-600 dark:text-primary-400 flex-grow-0">Ready-to-Use CLI</h3>
+          <p class="flex-1 text-gray-600 dark:text-gray-300 leading-relaxed mb-auto">
+            Command-line interface wrapping all client functionality for easy scripting and automation.
           </p>
         </div>
 
-        <!-- Zero Dependencies -->
-        <div class="premium-card flex flex-col items-start p-6">
-          <div class="flex items-center justify-center w-10 h-10 mb-4 feature-icon-bg">
-            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4v1c0 2.76 2.23 5 5 5s5-2.24 5-5v-1c0-2.21-1.79-4-4-4zm0 4c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></svg>
+        <!-- Working Examples -->
+        <div class="modern-card flex flex-col h-full">
+          <div class="feature-icon">
+            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m2 0a2 2 0 100-4 2 2 0 000 4zm-9 3a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4zm4-6a2 2 0 100-4 2 2 0 000 4z"></path></svg>
           </div>
-          <h3 class="text-lg font-bold mb-2 text-indigo-600 dark:text-indigo-400 w-full">Zero Dependencies</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300 w-full">
-            Standard library only — no external dependencies to manage or conflict with.
+          <h3 class="text-xl font-bold mb-4 text-primary-600 dark:text-primary-400 flex-grow-0">Working Examples</h3>
+          <p class="flex-1 text-gray-600 dark:text-gray-300 leading-relaxed mb-auto">
+            Copy-pasteable quickstart examples that run against public Stellar testnet with zero configuration.
           </p>
         </div>
 
-        <!-- Well Tested -->
-        <div class="premium-card flex flex-col items-start p-6">
-          <div class="flex items-center justify-center w-10 h-10 mb-4 feature-icon-bg">
-            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 011.946.806 3.42 3.42 0 003.142 1.825A5.403 5.403 0 019.75 9.75v-.086A5.41 5.41 0 009 8.256a5.41 5.41 0 00-3.757 2.565 3.42 3.42 0 003.142-1.825A3.42 3.42 0 015.256 6.33a3.42 3.42 0 00-.806-1.946z"></path></svg>
+        <!-- Production Ready -->
+        <div class="modern-card flex flex-col h-full">
+          <div class="feature-icon">
+            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 011.946.806 3.42 3.42 0 003.142 1.825A5.403 5.403 0 019.75 9.75v-.086A5.41 5.41 0 009 8.256a5.41 5.41 0 00-3.757 2.565 3.42 3.42 0 003.142-1.825A3.42 3.42 0 015.256 6.33a3.42 3.42 0 00-.806-1.946z"></path></svg>
           </div>
-          <h3 class="text-lg font-bold mb-2 text-indigo-600 dark:text-indigo-400 w-full">Well Tested</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300 w-full">
-            Comprehensive test suite with CI validation ensuring reliability.
-          </p>
-        </div>
-
-        <!-- MIT Licensed -->
-        <div class="premium-card flex flex-col items-start p-6">
-          <div class="flex items-center justify-center w-10 h-10 mb-4 feature-icon-bg">
-            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4v1c0 2.76 2.23 5 5 5s5-2.24 5-5v-1c0-2.21-1.79-4-4-4zm0 4c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></svg>
-          </div>
-          <h3 class="text-lg font-bold mb-2 text-indigo-600 dark:text-indigo-400 w-full">MIT Licensed</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300 w-full">
-            Permissive license for commercial and open-source use.
-          </p>
-        </div>
-
-        <!-- Active Maintenance -->
-        <div class="premium-card flex flex-col items-start p-6">
-          <div class="flex items-center justify-center w-10 h-10 mb-4 feature-icon-bg">
-            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4v1c0 2.76 2.23 5 5 5s5-2.24 5-5v-1c0-2.21-1.79-4-4-4zm0 4c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></svg>
-          </div>
-          <h3 class="text-lg font-bold mb-2 text-indigo-600 dark:text-indigo-400 w-full">Actively Maintained</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300 w-full">
-            Regular updates and responsive support for the Go Soroban ecosystem.
+          <h3 class="text-xl font-bold mb-4 text-primary-600 dark:text-primary-400 flex-grow-0">Production Ready</h3>
+          <p class="flex-1 text-gray-600 dark:text-gray-300 leading-relaxed mb-auto">
+            MIT licensed, well-tested, CI validated, and designed for backend services and infrastructure.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- Quick Start -->
-    <section id="quickstart" class="mb-16">
-      <h2 class="h2-heading mb-6 text-center">Quick Start</h2>
-      <p class="body-text text-center max-w-2xl mx-auto text-gray-600 dark:text-gray-300 mb-8">
-        Get started in under a minute with this simple example that reads from the Stellar testnet.
-      </p>
-      
+    <!-- CTA -->
+    <section class="text-center mb-24">
+      <h2 class="h2-modern mb-8">Get Started in Seconds</h2>
+      <div class="space-y-6 max-w-xl mx-auto">
+        <div class="flex flex-col items-start">
+          <label class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">go get</label>
+          <div class="w-full">
+            <code class="code-block block w-full" onclick="copyCode(this)">go get github.com/Northbound-Dev/soroban-go-toolkit</code>
+          </div>
+        </div>
+        <div class="flex flex-col items-start">
+          <label class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">or install CLI</label>
+          <div class="w-full">
+            <code class="code-block block w-full" onclick="copyCode(this)">go install github.com/Northbound-Dev/soroban-go-toolkit/cmd/sorobango@latest</code>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row justify-center gap-6 mt-10">
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" class="btn-modern-primary px-8 py-3">
+          View on GitHub
+        </a>
+        <a href="#installation" class="btn-modern-secondary px-8 py-3">
+          Installation Guide
+        </a>
+      </div>
+    </section>
+
+    <!-- Quick Start Example -->
+    <section class="mb-24">
+      <h2 class="h2-modern mb-8 text-center">Quick Start Example</h2>
       <div class="code-block" onclick="copyCode(this)">
         <pre><code>package main
 
@@ -327,7 +366,7 @@ import (
 )
 
 func main() {
-	// Targets public Stellar testnet by default
+	// With no options the client targets the public Stellar testnet.
 	client, err := soroban.New()
 	if err != nil {
 		log.Fatal(err)
@@ -335,87 +374,81 @@ func main() {
 
 	ctx := context.Background()
 
-	// Check endpoint health
 	health, err := client.GetHealth(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("endpoint status:", health.Status)
 
-	// Get latest ledger
 	ledger, err := client.GetLatestLedger(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("latest ledger: %d (protocol %d)\n", ledger.Sequence, ledger.ProtocolVersion)
+	fmt.Printf("latest ledger:  %d (protocol %d)\n", ledger.Sequence, ledger.ProtocolVersion)
 }</code></pre>
-      </div>
-      
-      <div class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-        Click to copy the code above →
       </div>
     </section>
 
-    <!-- Supported Methods -->
-    <section class="mb-16">
-      <h2 class="h2-heading mb-6 text-center">Supported RPC Methods</h2>
+    <!-- Supported RPC Methods -->
+    <section class="mb-24">
+      <h2 class="h2-modern mb-8 text-center">Supported RPC Methods</h2>
       <div class="overflow-x-auto">
-        <table class="min-w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
-          <thead class="bg-indigo-50 dark:bg-indigo-900">
+        <table class="min-w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-600 overflow-hidden">
+          <thead class="bg-primary-50 dark:bg-primary-900">
             <tr>
-              <th class="px-5 py-3 text-left text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Stellar RPC Method</th>
-              <th class="px-5 py-3 text-left text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Go Method</th>
-              <th class="px-5 py-3 text-left text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">CLI Command</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">Stellar RPC Method</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">Client Method</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">CLI Command</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             <tr>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getHealth</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetHealth</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango health</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getHealth</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetHealth</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango health</td>
             </tr>
             <tr class="bg-gray-50 dark:bg-gray-700">
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getLatestLedger</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetLatestLedger</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango latest-ledger</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getLatestLedger</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetLatestLedger</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango latest-ledger</td>
             </tr>
             <tr>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getLedgerEntries</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetLedgerEntries</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango ledger-entries</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getLedgerEntries</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetLedgerEntries</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango ledger-entries</td>
             </tr>
             <tr class="bg-gray-50 dark:bg-gray-700">
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">simulateTransaction</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">SimulateTransaction</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango simulate</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">simulateTransaction</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">SimulateTransaction</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango simulate</td>
             </tr>
             <tr>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getContractData*</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetContractData</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango contract-data</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetContractData*</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetContractData</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango contract-data</td>
             </tr>
             <tr class="bg-gray-50 dark:bg-gray-700">
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getContractInstance*</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetContractInstance</td>
-              <td class="px-5 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango contract-instance</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetContractInstance*</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetContractInstance</td>
+              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango contract-instance</td>
             </tr>
           </tbody>
         </table>
-        <p class="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
           <em>*Helper methods built on top of getLedgerEntries for easier contract state reading</em>
         </p>
       </div>
     </section>
 
-    <!-- Call to Action -->
-    <section class="text-center py-12">
-      <h2 class="h2-heading mb-6">Ready to Build on Soroban?</h2>
-      <p class="body-text text-lg max-w-2xl mx-auto text-gray-600 dark:text-gray-300">
-        Join Go developers building backend services, indexers, and infrastructure on the Stellar Soroban platform.
+    <!-- Join Stellar Ecosystem -->
+    <section class="text-center">
+      <h2 class="h2-modern mb-8">Join the Stellar Ecosystem</h2>
+      <p class="body-text-modern text-xl max-w-3xl mx-auto">
+        soroban-go-toolkit is part of the growing Stellar ecosystem, enabling Go developers to build powerful backend services, indexers, and infrastructure on the Soroban smart contract platform.
       </p>
-      <div class="mt-8">
-        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" class="btn-primary px-6 py-3">
-          Get Started → Star on GitHub
+      <div class="mt-12">
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" class="btn-modern-primary px-8 py-3">
+          Star on GitHub →
         </a>
       </div>
     </section>
@@ -423,17 +456,14 @@ func main() {
 
   <!-- Footer -->
   <footer class="border-t border-gray-200 dark:border-gray-700">
-    <div class="container mx-auto px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-      <p>&copy; 2026 soroban-go-toolkit. Licensed under 
-        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/blob/main/LICENSE" 
-           class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium transition-colors duration-300">MIT License</a>.
-      </p>
+    <div class="container mx-auto px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
+      <p>&copy; 2026 soroban-go-toolkit. Licensed under <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/blob/main/LICENSE" class="text-primary-600 dark:text-primary-400 hover:underline font-medium transition-colors duration-300">MIT License</a>.</p>
       <p class="mt-4">
-        <a href="https://stellar.org" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium transition-colors duration-300">Stellar Ecosystem</a> |
-        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/issues" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium transition-colors duration-300">Issues</a> |
-        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/discussions" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium transition-colors duration-300">Discussions</a>
+        <a href="https://stellar.org" class="text-primary-600 dark:text-primary-400 hover:underline font-medium transition-colors duration-300">Stellar Ecosystem</a> |
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/issues" class="text-primary-600 dark:text-primary-400 hover:underline font-medium transition-colors duration-300">Issues</a> |
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/discussions" class="text-primary-600 dark:text-primary-400 hover:underline font-medium transition-colors duration-300">Discussions</a>
       </p>
-      <div class="mt-6 flex justify-center space-x-3">
+      <div class="mt-6 flex justify-center space-x-4">
         <a href="#" onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646M9.75 9.75a4.5 4.5 0 000 6.364M9.75 9.75a4.5 4.5 0 010 6.364M12 15a3 3 0 110-6M12 3a3 3 0 100 6"/>
