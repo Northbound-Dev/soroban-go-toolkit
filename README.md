@@ -1,5 +1,6 @@
+<div style="text-align: justify">
 # soroban-go-toolkit
-Landing page: https://soroban-go-toolkit.vercel.app/
+🌐 https://soroban-go-toolkit.vercel.app/
 
 [![CI](https://github.com/Northbound-Dev/soroban-go-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/Northbound-Dev/soroban-go-toolkit/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/Northbound-Dev/soroban-go-toolkit.svg)](https://pkg.go.dev/github.com/Northbound-Dev/soroban-go-toolkit)
@@ -202,3 +203,4 @@ maintainer response-time commitment.
 ## License
 
 MIT — see [LICENSE](LICENSE).
+</div>
