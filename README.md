@@ -140,6 +140,157 @@ client, err := soroban.New(
 )
 ```
 
+
+### Detailed Usage Examples
+
+#### Reading Different ScVal Types
+
+The client provides helper functions to construct ledger keys for various types. To decode the returned `xdr.ScVal`, you can use the `github.com/stellar/go/xdr` package or perform a type switch on the `ScVal.Type` field.
+
+```go
+import (
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/Northbound-Dev/soroban-go-toolkit/pkg/soroban"
+	"github.com/stellar/go/xdr"
+)
+
+func readValues(ctx context.Context, client *soroban.Client, contractID string) {
+	// Read a string value
+	stringKey, err := soroban.SymbolKey("GREETING")
+	if err != nil {
+		log.Fatal(err)
+	}
+	stringData, err := client.GetContractData(ctx, contractID, stringKey, soroban.DurabilityPersistent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var str string
+	xdr.Unmarshal(stringData.Value(), &str)
+	fmt.Println("Greeting:", str)
+
+	// Read an i32 integer
+	i32Key, err := soroban.SymbolKey("COUNTER_I32")
+	if err != nil {
+		log.Fatal(err)
+	}
+	i32Data, err := client.GetContractData(ctx, contractID, i32Key, soroban.DurabilityPersistent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var i32 int32
+	xdr.Unmarshal(i32Data.Value(), &i32)
+	fmt.Println("Counter i32:", i32)
+
+	// Read an i64 integer
+	i64Key, err := soroban.SymbolKey("BIG_COUNTER")
+	if err != nil {
+		log.Fatal(err)
+	}
+	i64Data, err := client.GetContractData(ctx, contractID, i64Key, soroban.DurabilityPersistent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var i64 int64
+	xdr.Unmarshal(i64Data.Value(), &i64)
+	fmt.Println("Counter i64:", i64)
+
+	// Read a vector (array) of strings
+	vecKey, err := soroban.SymbolKey("ITEMS")
+	if err != nil {
+		log.Fatal(err)
+	}
+	vecData, err := client.GetContractData(ctx, contractID, vecKey, soroban.DurabilityPersistent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var vec []string
+	xdr.Unmarshal(vecData.Value(), &vec)
+	fmt.Println("Items:", vec)
+
+	// Read a map from string to i32
+	mapKey, err := soroban.SymbolKey("BALANCES")
+	if err != nil {
+		log.Fatal(err)
+	}
+	mapData, err := client.GetContractData(ctx, contractID, mapKey, soroban.DurabilityPersistent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var m map[string]int32
+	xdr.Unmarshal(mapData.Value(), &m)
+	fmt.Println("Balances:", m)
+}
+```
+
+#### Simulating Contract Function Calls
+
+To invoke a contract function (without submitting a transaction), use the `SimulateTransaction` method. This requires constructing a transaction with the appropriate invocations.
+
+```go
+import (
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/Northbound-Dev/soroban-go-toolkit/pkg/soroban"
+	"github.com/stellar/go/txnbuild"
+)
+
+func simulateContract(ctx context.Context, client *soroban.Client, contractID string) {
+	// Build a transaction that invokes a contract function
+	// Note: This example assumes you have a funded account for the source.
+	// For simulation only, the source account does not need to be funded.
+	sourceAccount := txnbuild.Account{
+		Address: "GDG...", // replace with your account address
+		Sequence: 1,
+	}
+	invoke := txnbuild.InvokeHostFunction{
+		ContractAddress: contractID,
+		FunctionName:    "increment",
+		Args: []txnbuild.ScVal{
+			txnbuild.ScVec{[]txnbuild.ScVal{
+				txnbuild.ScvString("COUNTER"),
+			}}.ToScVal(),
+		},
+	}
+	tx, err := txnbuild.BuildTx(
+		sourceAccount,
+		txnbuild.Network{NetworkPassphrase: txnbuild.TestNetworkPassphrase},
+		&invoke,
+		txnbuild.BuildTxOpts{
+			InheritMinimalFee: true,
+			PreflightMemo:     true,
+			// For simulation, we don't need to sign
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	txe, err := tx.Base64()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Simulate the transaction
+	simResult, err := client.SimulateTransaction(ctx, txe)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if simResult.Error != nil {
+		fmt.Printf("Simulation error: %s\n", simResult.Error)
+		return
+	}
+	fmt.Println("Simulation success:", simResult)
+}
+```
+
+> **Note**: The above examples require the `github.com/stellar/go` package for transaction building and XDR unmarshalling. For pure reading examples, only the soroban-go-toolkit is needed.
+
+See the [`examples/`](examples/) directory for runnable examples that you can adapt.
+
 ## Supported RPC methods
 
 | Stellar RPC method | Client method | CLI command |
