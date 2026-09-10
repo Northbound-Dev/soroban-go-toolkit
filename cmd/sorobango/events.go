@@ -16,9 +16,9 @@ import (
 // and tied to the SDK's internal representation. Declaring the output
 // explicitly keeps --json a stable contract for scripts.
 type eventsOutput struct {
-	LatestLedger uint32            `json:"latestLedger"`
-	Events       []eventOutput     `json:"events"`
-	Cursor       string            `json:"cursor,omitempty"`
+	LatestLedger uint32        `json:"latestLedger"`
+	Events       []eventOutput `json:"events"`
+	Cursor       string        `json:"cursor,omitempty"`
 }
 
 // eventOutput is the CLI's own JSON shape for a single event.

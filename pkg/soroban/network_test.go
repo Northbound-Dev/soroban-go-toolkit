@@ -7,28 +7,28 @@ import (
 
 func TestGetNetwork(t *testing.T) {
 	tests := []struct {
-		name             string
-		result           string
-		wantPassport     string
-		wantProtocolV    uint32
+		name          string
+		result        string
+		wantPassport  string
+		wantProtocolV uint32
 	}{
 		{
-			name:             "mainnet-like network",
-			result:           `{"passport":"Public Global Stellar Network ; September 2019","protocolVersion":18}`,
-			wantPassport:     "Public Global Stellar Network ; September 2019",
-			wantProtocolV:    18,
+			name:          "mainnet-like network",
+			result:        `{"passport":"Public Global Stellar Network ; September 2019","protocolVersion":18}`,
+			wantPassport:  "Public Global Stellar Network ; September 2019",
+			wantProtocolV: 18,
 		},
 		{
-			name:             "testnet-like network",
-			result:           `{"passport":"Testnet ; September 2019","protocolVersion":18}`,
-			wantPassport:     "Testnet ; September 2019",
-			wantProtocolV:    18,
+			name:          "testnet-like network",
+			result:        `{"passport":"Testnet ; September 2019","protocolVersion":18}`,
+			wantPassport:  "Testnet ; September 2019",
+			wantProtocolV: 18,
 		},
 		{
-			name:             "futurenet-like network",
-			result:           `{"passport":"Test SDF Future Network ; September 2019","protocolVersion":19}`,
-			wantPassport:     "Test SDF Future Network ; September 2019",
-			wantProtocolV:    19,
+			name:          "futurenet-like network",
+			result:        `{"passport":"Test SDF Future Network ; September 2019","protocolVersion":19}`,
+			wantPassport:  "Test SDF Future Network ; September 2019",
+			wantProtocolV: 19,
 		},
 	}
 
@@ -57,22 +57,22 @@ func TestGetNetwork(t *testing.T) {
 
 func TestGetVersionInfo(t *testing.T) {
 	tests := []struct {
-		name              string
-		result            string
-		wantCoreVersion   string
-		wantStellarCoreV  string
+		name             string
+		result           string
+		wantCoreVersion  string
+		wantStellarCoreV string
 	}{
 		{
-			name:              "typical version info",
-			result:            `{"coreVersion":"stellar-horizon-v2.0.0-rc1","stellarCoreVersion":"stellar-core-v20.0.0"}`,
-			wantCoreVersion:   "stellar-horizon-v2.0.0-rc1",
-			wantStellarCoreV:  "stellar-core-v20.0.0",
+			name:             "typical version info",
+			result:           `{"coreVersion":"stellar-horizon-v2.0.0-rc1","stellarCoreVersion":"stellar-core-v20.0.0"}`,
+			wantCoreVersion:  "stellar-horizon-v2.0.0-rc1",
+			wantStellarCoreV: "stellar-core-v20.0.0",
 		},
 		{
-			name:              "empty version fields",
-			result:            `{"coreVersion":"","stellarCoreVersion":""}`,
-			wantCoreVersion:   "",
-			wantStellarCoreV:  "",
+			name:             "empty version fields",
+			result:           `{"coreVersion":"","stellarCoreVersion":""}`,
+			wantCoreVersion:  "",
+			wantStellarCoreV: "",
 		},
 	}
 

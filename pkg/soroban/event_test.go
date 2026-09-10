@@ -14,9 +14,9 @@ func TestGetEvents(t *testing.T) {
 		wantCount  int
 	}{
 		{
-			name:    "no filters",
-			req:     &GetEventsRequest{},
-			result:  `{"latestLedger":1339385,"events":[{"contractAddress":"CAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","topics":["abc123"],"data":"AAAAAQ==","ledger":1339385,"ledgerCloseTime":1609459200,"id":"event1","pagingToken":"cursor123"}],"cursor":"cursor123"}`,
+			name:       "no filters",
+			req:        &GetEventsRequest{},
+			result:     `{"latestLedger":1339385,"events":[{"contractAddress":"CAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","topics":["abc123"],"data":"AAAAAQ==","ledger":1339385,"ledgerCloseTime":1609459200,"id":"event1","pagingToken":"cursor123"}],"cursor":"cursor123"}`,
 			wantLedger: 1339385,
 			wantCount:  1,
 		},
@@ -27,18 +27,18 @@ func TestGetEvents(t *testing.T) {
 					ContractIDs: []string{"CAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"},
 				},
 			},
-			result:  `{"latestLedger":1339385,"events":[{"contractAddress":"CAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","topics":["def456"],"data":"AAAAAg==","ledger":1339385,"ledgerCloseTime":1609459260,"id":"event2","pagingToken":"cursor456"}],"cursor":"cursor456"}`,
+			result:     `{"latestLedger":1339385,"events":[{"contractAddress":"CAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","topics":["def456"],"data":"AAAAAg==","ledger":1339385,"ledgerCloseTime":1609459260,"id":"event2","pagingToken":"cursor456"}],"cursor":"cursor456"}`,
 			wantLedger: 1339385,
 			wantCount:  1,
 		},
 		{
 			name: "with pagination",
 			req: &GetEventsRequest{
-				Cursor:  "starting_cursor",
-				Limit:   10,
-				Order:   "asc",
+				Cursor: "starting_cursor",
+				Limit:  10,
+				Order:  "asc",
 			},
-			result:  `{"latestLedger":1339385,"events":[{"contractAddress":"CAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","topics":["ghi789"],"data":"AAAAAw==","ledger":1339385,"ledgerCloseTime":1609459320,"id":"event3","pagingToken":"cursor789"}],"cursor":"cursor789"}`,
+			result:     `{"latestLedger":1339385,"events":[{"contractAddress":"CAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","topics":["ghi789"],"data":"AAAAAw==","ledger":1339385,"ledgerCloseTime":1609459320,"id":"event3","pagingToken":"cursor789"}],"cursor":"cursor789"}`,
 			wantLedger: 1339385,
 			wantCount:  1,
 		},
