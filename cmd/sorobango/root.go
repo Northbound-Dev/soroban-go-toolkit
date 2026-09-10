@@ -59,6 +59,7 @@ the URL of an RPC instance you run yourself or obtain from a provider.`,
 		newContractDataCommand(opts),
 		newContractInstanceCommand(opts),
 		newSimulateCommand(opts),
+		newTransactionCommand(opts),
 	)
 
 	return root
