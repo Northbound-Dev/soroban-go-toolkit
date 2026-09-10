@@ -198,7 +198,7 @@ func readValues(ctx context.Context, client *soroban.Client, contractID string) 
 	fmt.Println("Counter i64:", i64)
 
 	// Read a vector (array) of strings
-	vecKey, err := soroban.SymbolKey("ITEMS")
+	vecKey, err := soroban.SymbolKey("ITEAMS")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -224,6 +224,84 @@ func readValues(ctx context.Context, client *soroban.Client, contractID string) 
 	fmt.Println("Balances:", m)
 }
 ```
+
+#### Using Decoding Helpers for Complex Types
+
+The soroban-go-toolkit provides decoding helpers for complex ScVal types, eliminating the need for manual XDR unmarshalling. These helpers are in the `github.com/Northbound-Dev/soroban-go-toolkit/pkg/soroban` package.
+
+```go
+import (
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/Northbound-Dev/soroban-go-toolkit/pkg/soroban"
+)
+
+func readComplexValues(ctx context.Context, client *soroban.Client, contractID string) {
+	// Read a 128-bit integer
+	i128Key, err := soroban.SymbolKey("BIG_NUMBER")
+	if err != nil {
+		log.Fatal(err)
+	}
+	i128Data, err := client.GetContractData(ctx, contractID, i128Key, soroban.DurabilityPersistent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	i128, err := soroban.DecodeI128(i128Data.Value())
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Big number:", i128)
+
+	// Read a 256-bit unsigned integer
+	u256Key, err := soroban.SymbolKey("LARGE_COUNT")
+	if err != nil {
+		log.Fatal(err)
+	}
+	u256Data, err := client.GetContractData(ctx, contractID, u256Key, soroban.DurabilityPersistent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	u256, err := soroban.DecodeU256(u256Data.Value())
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Large count:", u256)
+
+	// Read a vector of addresses
+	addrVecKey, err := soroban.SymbolKey("ADDRESSES")
+	if err != nil {
+		log.Fatal(err)
+	}
+	addrVecData, err := client.GetContractData(ctx, contractID, addrVecKey, soroban.DurabilityPersistent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	addrs, err := soroban.DecodeVec(addrVecData.Value(), soroban.DecodeAddress)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Addresses:", addrs)
+
+	// Read a map from string to string (e.g., configuration)
+	configKey, err := soroban.SymbolKey("CONFIG")
+	if err != nil {
+		log.Fatal(err)
+	}
+	configData, err := client.GetContractData(ctx, contractID, configKey, soroban.DurabilityPersistent)
+	if err != nil {
+		log.Fatal(err)
+	}
+	config, err := soroban.DecodeMap(configData.Value(), soroban.DecodeString, soroban.DecodeString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Configuration:", config)
+}
+```
+
+> **Note**: The decoding helpers in the soroban package eliminate the need for the `github.com/stellar/go/xdr` package for most use cases. However, the stellar-go package is still required for transaction building and advanced XDR manipulation.
 
 #### Simulating Contract Function Calls
 
@@ -289,35 +367,7 @@ func simulateContract(ctx context.Context, client *soroban.Client, contractID st
 
 > **Note**: The above examples require the `github.com/stellar/go` package for transaction building and XDR unmarshalling. For pure reading examples, only the soroban-go-toolkit is needed.
 
-See the [`examples/`](examples/) directory for runnable examples that you can adapt.
-
-## Supported RPC methods
-
-| Stellar RPC method | Client method | CLI command |
-| --- | --- | --- |
-| `getHealth` | `GetHealth` | `sorobango health` |
-| `getLatestLedger` | `GetLatestLedger` | `sorobango latest-ledger` |
-| `getLedgerEntries` | `GetLedgerEntries` | `sorobango ledger-entries` |
-| `simulateTransaction` | `SimulateTransaction` | `sorobango simulate` |
-
-Built on top of `getLedgerEntries`, for reading contract state without
-constructing XDR by hand:
-
-| Helper | CLI command | Purpose |
-| --- | --- | --- |
-| `GetContractData` | `sorobango contract-data` | Read one value from contract storage |
-| `GetContractInstance` | `sorobango contract-instance` | Read a contract's instance entry |
-
-Note that `getContractData` is not a Stellar RPC method — it existed in early
-Soroban previews and was removed. Contract state is read via `getLedgerEntries`,
-which is what these helpers do.
-
-## CLI
-
-Every command takes `--rpc-url`, `--timeout`, and `--json`, and exits non-zero
-on failure so it composes in scripts.
-
-```sh
+See the [`examples/`](examples/) directory for runnable examples that you can adapt.```sh
 sorobango health
 sorobango latest-ledger --json
 sorobango contract-data CXXX...  COUNTER --durability persistent
