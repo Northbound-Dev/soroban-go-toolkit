@@ -340,6 +340,42 @@ These are tracked as issues and are good places to start contributing:
 - `getNetwork` and `getVersionInfo` — endpoint metadata
 - Typed decoding for structured `ScVal` values (maps, vectors, `i128`/`u256`)
 
+
+## Troubleshooting
+
+### Common Issues
+
+**Error: "command not found: sorobango" after installation**
+This usually means your `$GOPATH/bin` directory is not in your system's PATH. After installing with `go install`, add `$GOPATH/bin` to your PATH:
+
+```sh
+export PATH=$PATH:$(go env GOPATH)/bin
+```
+
+To make this permanent, add the above line to your shell profile (~/.bashrc, ~/.zshrc, etc.).
+
+**Error: timeout or connection refused when connecting to Stellar RPC**
+Ensure you have an active internet connection and that the RPC endpoint is accessible. You can test connectivity with:
+
+```sh
+curl -s https://soroban-testnet.stellar.org
+```
+
+If using a custom RPC endpoint, verify the URL is correct and the service is running.
+
+**Error: contract not found when it should exist**
+Double-check that you're using the correct network (testnet vs futurenet vs mainnet) and that the contract address is for that specific network. Contract addresses are network-specific.
+
+### Getting Help
+If you encounter issues not covered here:
+1. Check the [existing issues](https://github.com/Northbound-Dev/soroban-go-toolkit/issues)
+2. Create a new issue with detailed information about your problem
+3. Include:
+   - Your Go version (`go version`)
+   - The soroban-go-toolkit version (from `go list -m github.com/Northbound-Dev/soroban-go-toolkit`)
+   - The exact command you're running
+   - The full error message
+   - Steps to reproduce the issue
 ## Status
 
 Pre-1.0. The implemented methods are tested and working, but the exported API
