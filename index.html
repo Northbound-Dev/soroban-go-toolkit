@@ -3,475 +3,584 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>soroban-go-toolkit - Go Client for Soroban Smart Contracts</title>
-  <!-- Google Font: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Tailwind CSS via CDN -->
+  <title>soroban-go-toolkit — Go Client for Soroban Smart Contracts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Heroicons for SVG icons -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/heroicons/2.0.18/heroicons.min.css" rel="stylesheet">
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            primary: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              200: '#bfdbfe',
-              300: '#93c5fd',
-              400: '#60a5fa',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8',
-              800: '#1e40af',
-              900: '#1e3a8a',
-              950: '#172554'
-            }
+            surface: {
+              50: '#fafafa', 100: '#f4f4f5', 200: '#e4e4e7', 300: '#d4d4d8',
+              400: '#a1a1aa', 500: '#71717a', 600: '#52525b', 700: '#3f3f46',
+              800: '#27272a', 900: '#18181b', 950: '#09090b'
+            },
+            accent: {
+              400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9'
+            },
+            glow: '#c4b5fd'
           },
           fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif']
-          },
-          boxShadow: {
-            glass: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Menlo', 'monospace']
           }
         }
       }
     }
   </script>
   <script>
-    // Dark mode toggle with localStorage persistence
     const html = document.documentElement;
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      html.classList.add('dark');
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light' || (!saved && !window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.remove('dark');
     }
-
-    // Add toggle button functionality
     function toggleTheme() {
-      if (html.classList.contains('dark')) {
-        html.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      } else {
-        html.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      }
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     }
-
-    // Copy to clipboard functionality
-    function copyCode(element) {
-      const code = element.querySelector('code').textContent;
+    function copyCode(el) {
+      const code = el.querySelector('code').textContent;
       navigator.clipboard.writeText(code).then(() => {
-        // Show temporary success message
-        const originalText = element.textContent;
-        element.textContent = 'Copied!';
-        setTimeout(() => {
-          element.textContent = originalText;
-        }, 2000);
-      }).catch(err => {
-        console.error('Failed to copy: ', err);
+        el.dataset.label = el.querySelector('.copy-label').textContent;
+        el.querySelector('.copy-label').textContent = 'Copied!';
+        setTimeout(() => { el.querySelector('.copy-label').textContent = el.dataset.label; }, 2000);
       });
     }
-
-    // Expose to global for potential use
-    window.toggleTheme = toggleTheme;
-    window.copyCode = copyCode;
+    // Scroll-triggered fade-in
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.15 });
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    });
   </script>
   <style>
-    /* Glassmorphism effect */
-    .glass {
-      @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border border-white/20 dark:border-gray-700/20 shadow-glass;
+    * { scrollbar-width: thin; scrollbar-color: #3f3f46 transparent; }
+    ::selection { background: #7c3aed33; }
+    body { font-family: 'Inter', system-ui, sans-serif; }
+
+    /* Reveal animation */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s cubic-bezier(.16,1,.3,1), transform 0.7s cubic-bezier(.16,1,.3,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* Hero mesh gradient */
+    .hero-mesh {
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139,92,246,0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(99,102,241,0.12), transparent),
+        radial-gradient(ellipse 50% 60% at 50% 80%, rgba(168,85,247,0.08), transparent);
+    }
+    .dark .hero-mesh {
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139,92,246,0.2), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(99,102,241,0.15), transparent),
+        radial-gradient(ellipse 50% 60% at 50% 80%, rgba(168,85,247,0.1), transparent);
     }
 
-    /* Modern card styles */
-    .modern-card {
-      @apply glass rounded-2xl p-8 transition-all duration-500 hover:shadow-xl hover:-translate-y-1;
+    /* Grain overlay */
+    .grain::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 200px;
+      pointer-events: none;
+      z-index: 1;
     }
 
-    /* Feature icon styles */
-    .feature-icon {
-      @apply w-14 h-14 rounded-2xl flex items-center justify-center mb-6;
-      @apply bg-primary-50 dark:bg-primary-900/20;
-    }
-
-    /* Enhanced typography */
-    .h1-modern {
-      @apply text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tighter bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent;
-    }
-
-    .h2-modern {
-      @apply text-3xl md:text-4xl font-semibold leading-tight text-gray-900 dark:text-gray-100;
-    }
-
-    .body-text-modern {
-      @apply text-lg leading-relaxed text-gray-600 dark:text-gray-300;
-    }
-
-    /* Button styles */
-    .btn-modern-primary {
-      @apply bg-primary-600 hover:bg-primary-700 active:bg-primary-800
-             text-white font-medium px-8 py-3 rounded-xl
-             shadow-lg hover:shadow-xl active:shadow-lg
-             transition-all duration-300 transform hover:scale-105;
-    }
-
-    .btn-modern-secondary {
-      @apply bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700
-             text-primary-600 dark:text-primary-400 font-medium px-8 py-3 rounded-xl
-             border border-primary-200 dark:border-primary-700 hover:border-primary-300 dark:hover:border-primary-600
-             shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105;
-    }
-
-    /* Stats styling */
-    .stat-modern {
-      @apply glass rounded-2xl p-8 text-center transition-all duration-500 hover:shadow-xl hover:-translate-y-1;
-    }
-
-    .stat-number {
-      @apply text-4xl font-bold text-primary-600 dark:text-primary-400 mb-2;
-    }
-
-    .stat-label {
-      @apply text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider;
-    }
-
-    /* Code block enhancements */
+    /* Code block */
     .code-block {
-      @apply bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600
-             p-6 font-mono text-sm leading-relaxed overflow-x-auto cursor-pointer
-             shadow-inner hover:shadow-lg transition-shadow duration-300 select-none glass;
+      background: #1e1e2e;
+      border: 1px solid #313244;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .code-block:hover { border-color: #585b70; }
+    .code-block .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px;
+      background: #181825;
+      border-bottom: 1px solid #313244;
+      font-size: 12px; color: #6c7086;
+    }
+    .code-block pre { padding: 20px; overflow-x: auto; margin: 0; }
+    .code-block code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: #cdd6f4; }
+
+    /* Syntax colors */
+    .kw { color: #cba6f7; }
+    .fn { color: #89b4fa; }
+    .str { color: #a6e3a1; }
+    .cm { color: #6c7086; font-style: italic; }
+    .tp { color: #f9e2af; }
+    .num { color: #fab387; }
+
+    /* Navbar blur */
+    .nav-blur {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
     }
 
-    .code-block:hover {
-      @apply bg-gray-100 dark:bg-gray-600;
+    /* Glow card */
+    .glow-card {
+      position: relative;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(.16,1,.3,1);
+    }
+    .glow-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 16px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(139,92,246,0), rgba(139,92,246,0));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      transition: background 0.4s;
+      pointer-events: none;
+    }
+    .glow-card:hover::before {
+      background: linear-gradient(135deg, rgba(139,92,246,0.4), rgba(99,102,241,0.2));
+    }
+    .glow-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -12px rgba(139,92,246,0.15);
     }
 
-    /* Gradient enhancements */
-    .hero-gradient {
-      @apply bg-gradient-to-br from-primary-500 via-primary-400 to-primary-300;
+    /* Stat pill */
+    .stat-pill {
+      background: rgba(139,92,246,0.06);
+      border: 1px solid rgba(139,92,246,0.12);
+      border-radius: 16px;
+      transition: all 0.3s;
+    }
+    .stat-pill:hover {
+      background: rgba(139,92,246,0.1);
+      border-color: rgba(139,92,246,0.25);
     }
 
-    /* Focus rings for accessibility */
-    .focus-ring:focus-visible {
-      @outline-offset 2px;
-      @outline 2px solid primary-500;
+    /* Table */
+    .table-modern { border-collapse: separate; border-spacing: 0; }
+    .table-modern th {
+      background: rgba(139,92,246,0.06);
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #a78bfa;
     }
+    .table-modern td { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .table-modern tr:last-child td { border-bottom: none; }
+    .table-modern tbody tr { transition: background 0.2s; }
+    .table-modern tbody tr:hover { background: rgba(139,92,246,0.04); }
 
-    /* Animation utilities */
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
+    /* Button glow */
+    .btn-glow {
+      position: relative;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      transition: all 0.3s;
     }
+    .btn-glow::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      filter: blur(16px);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: -1;
+    }
+    .btn-glow:hover::after { opacity: 0.5; }
+    .btn-glow:hover { transform: translateY(-1px); }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.8; }
+    /* Pill badge */
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 13px; font-weight: 500;
+      background: rgba(139,92,246,0.08);
+      border: 1px solid rgba(139,92,246,0.15);
+      color: #a78bfa;
+      transition: all 0.3s;
     }
+    .badge:hover { background: rgba(139,92,246,0.14); border-color: rgba(139,92,246,0.3); }
 
-    .animate-float {
-      animation: float 6s ease-in-out infinite;
+    /* Scroll indicator */
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateY(0); opacity: 0.6; }
+      50% { transform: translateY(6px); opacity: 1; }
     }
+    .scroll-indicator { animation: scrollBounce 2s ease-in-out infinite; }
 
-    .animate-pulse-slow {
-      animation: pulse 4s ease-in-out infinite;
-    }
-
-    /* Mobile optimizations */
-    @media (max-width: 640px) {
-      .h1-modern {
-        @apply text-4xl md:text-5xl;
-      }
-      
-      .h2-modern {
-        @apply text-xl md:text-2xl;
-      }
-      
-      .body-text-modern {
-        @apply text-base;
-      }
-      
-      .modern-card {
-        @apply p-6;
-      }
-    }
+    /* Smooth scroll */
+    html { scroll-behavior: smooth; }
   </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans antialiased">
-  <!-- Theme Toggle Button (fixed position) -->
-  <button onclick="toggleTheme()"
-          class="fixed top-4 right-4 z-50 p-2 rounded-full bg-white dark:bg-gray-800/50 hover:bg-white/10 dark:hover:bg-gray-700/50
-                 shadow-lg focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
-                 transition-all duration-300 transform hover:scale-110
-                 aria-label='Toggle dark mode'"
-          :class="{ 'dark:text-white': document.documentElement.classList.contains('dark') }">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M20.354 15.354A9 9 0 018.646 3.646M9.75 9.75a4.5 4.5 0 000 6.364M9.75 9.75a4.5 4.5 0 010 6.364M12 15a3 3 0 110-6M12 3a3 3 0 100 6"/>
-    </svg>
-  </button>
+<body class="bg-surface-950 text-surface-200 antialiased overflow-x-hidden">
 
-  <!-- Header -->
-  <header class="hero-gradient text-white py-24">
-    <div class="container mx-auto px-6 text-center">
-      <div class="inline-block">
-        <h1 class="h1-modern mb-6">
-          soroban-go-toolkit
-        </h1>
-        <p class="body-text-modern text-xl md:text-2xl opacity-90 max-w-3xl mx-auto leading-relaxed">
-          A modern Go client library and CLI for reading Soroban smart contract state on the Stellar network
+  <!-- NAVBAR -->
+  <nav class="fixed top-0 inset-x-0 z-50 nav-blur bg-surface-950/70 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5 group">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center text-white text-sm font-bold tracking-tight shadow-lg shadow-accent-500/20">S</div>
+        <span class="font-semibold text-white text-sm tracking-tight group-hover:text-accent-400 transition-colors">soroban-go-toolkit</span>
+      </a>
+      <div class="hidden md:flex items-center gap-8 text-sm text-surface-400">
+        <a href="#features" class="hover:text-white transition-colors">Features</a>
+        <a href="#quickstart" class="hover:text-white transition-colors">Quick Start</a>
+        <a href="#methods" class="hover:text-white transition-colors">RPC Methods</a>
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" target="_blank" class="hover:text-white transition-colors">GitHub ↗</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-white/5 text-surface-400 hover:text-white transition-all" aria-label="Toggle theme">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" target="_blank" class="hidden md:inline-flex px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-surface-300 hover:text-white hover:border-white/20 transition-all">
+          ⭐ Star
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="relative min-h-screen flex items-center justify-center hero-mesh grain pt-16">
+    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center py-24">
+      <!-- Badge -->
+      <div class="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/10 border border-accent-500/20 text-accent-400 text-sm font-medium mb-8">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        Stellar Ecosystem · MIT Licensed
+      </div>
+
+      <!-- Title -->
+      <h1 class="reveal reveal-delay-1 text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.05] mb-6">
+        Soroban Smart Contracts<br>
+        <span class="bg-gradient-to-r from-accent-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">in Idiomatic Go</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="reveal reveal-delay-2 text-lg sm:text-xl text-surface-400 max-w-2xl mx-auto leading-relaxed mb-10">
+        A typed Go client library and CLI for reading Soroban contract state on Stellar. Built for indexers, bots, monitoring, and backend infrastructure.
+      </p>
+
+      <!-- Install command -->
+      <div class="reveal reveal-delay-3 max-w-lg mx-auto mb-10">
+        <div class="flex items-center bg-surface-900 border border-white/10 rounded-xl overflow-hidden group hover:border-accent-500/30 transition-colors">
+          <span class="pl-4 text-accent-400 font-mono text-xs select-none">$</span>
+          <code class="flex-1 px-3 py-3.5 font-mono text-sm text-surface-300 overflow-x-auto whitespace-nowrap">go get github.com/Northbound-Dev/soroban-go-toolkit</code>
+          <button onclick="copyCode(this.closest('.flex'))" class="px-4 py-3.5 text-surface-500 hover:text-accent-400 transition-colors border-l border-white/5 hover:bg-white/5">
+            <span class="copy-label text-xs font-medium">Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="reveal reveal-delay-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="#quickstart" class="btn-glow px-7 py-3 rounded-xl text-white font-medium text-sm inline-flex items-center gap-2">
+          Get Started
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </a>
+        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" target="_blank" class="px-7 py-3 rounded-xl text-surface-300 font-medium text-sm border border-white/10 hover:border-white/20 hover:text-white transition-all inline-flex items-center gap-2">
+          View on GitHub
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="mt-20 scroll-indicator">
+        <svg class="w-5 h-5 mx-auto text-surface-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="relative py-20 border-t border-white/5">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="reveal stat-pill p-6 text-center">
+          <div class="text-3xl font-bold text-white mb-1">6</div>
+          <div class="text-xs text-surface-500 font-medium uppercase tracking-wider">RPC Methods</div>
+        </div>
+        <div class="reveal reveal-delay-1 stat-pill p-6 text-center">
+          <div class="text-3xl font-bold text-white mb-1">100<span class="text-accent-400 text-lg">%</span></div>
+          <div class="text-xs text-surface-500 font-medium uppercase tracking-wider">Test Covered</div>
+        </div>
+        <div class="reveal reveal-delay-2 stat-pill p-6 text-center">
+          <div class="text-3xl font-bold text-white mb-1">0</div>
+          <div class="text-xs text-surface-500 font-medium uppercase tracking-wider">External Deps</div>
+        </div>
+        <div class="reveal reveal-delay-3 stat-pill p-6 text-center">
+          <div class="text-3xl font-bold text-white mb-1">Go<span class="text-accent-400 text-lg"> 1.24</span></div>
+          <div class="text-xs text-surface-500 font-medium uppercase tracking-wider">Minimum Version</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section class="relative py-24">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <div class="reveal">
+        <span class="text-xs font-semibold text-accent-400 uppercase tracking-widest mb-4 block">Why this exists</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-8">
+          Go developers shouldn't have to hand-roll JSON-RPC
+        </h2>
+      </div>
+      <div class="reveal reveal-delay-1 space-y-5 text-surface-400 text-base leading-relaxed">
+        <p>
+          Most Soroban tooling targets <span class="text-surface-300 font-medium">Rust</span> or <span class="text-surface-300 font-medium">TypeScript</span>. But Go is where a lot of backend infrastructure actually lives — indexers, bots, monitoring, internal services.
+        </p>
+        <p>
+          Developers reaching for Soroban in Go have had to manually construct JSON-RPC calls and wrestle with XDR encoding themselves. This toolkit fills that gap with <span class="text-accent-400 font-medium">idiomatic, typed Go bindings</span> for the Stellar Soroban RPC API.
         </p>
       </div>
+    </div>
+  </section>
 
-      <!-- Subtle animated decoration -->
-      <div class="mt-12 flex justify-center space-x-6">
-        <div class="w-8 h-8 bg-white/20 rounded-full animate-float">
-          <div class="w-4 h-4 bg-white/30 rounded-full mx-auto mt-2 animate-pulse-slow"></div>
-        </div>
-        <div class="w-8 h-8 bg-white/20 rounded-full animate-float" style="animation-delay: 2s;">
-          <div class="w-4 h-4 bg-white/30 rounded-full mx-auto mt-2 animate-pulse-slow" style="animation-delay: 1s;"></div>
-        </div>
-        <div class="w-8 h-8 bg-white/20 rounded-full animate-float" style="animation-delay: 4s;">
-          <div class="w-4 h-4 bg-white/30 rounded-full mx-auto mt-2 animate-pulse-slow" style="animation-delay: 3s;"></div>
-        </div>
+  <!-- FEATURES -->
+  <section id="features" class="relative py-24">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="reveal text-center mb-16">
+        <span class="text-xs font-semibold text-accent-400 uppercase tracking-widest mb-4 block">Capabilities</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Everything you need</h2>
       </div>
-
-      <div class="flex flex-wrap justify-center gap-3 mt-10">
-        <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">MIT License</span>
-        <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-md backdrop-blur-sm">Go 1.24+</span>
-        <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-md backdrop-blur-sm">CI Tested</span>
-        <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-md backdrop-blur-sm">Stellar Ecosystem</span>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Card 1 -->
+        <div class="reveal glow-card p-7 group">
+          <div class="w-11 h-11 rounded-xl bg-accent-500/10 flex items-center justify-center mb-5 group-hover:bg-accent-500/20 transition-colors">
+            <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="text-white font-semibold mb-2">Complete RPC Client</h3>
+          <p class="text-surface-400 text-sm leading-relaxed">Typed request/response structs for getHealth, getLatestLedger, getContractData, simulateTransaction, and more — with proper error handling.</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="reveal reveal-delay-1 glow-card p-7 group">
+          <div class="w-11 h-11 rounded-xl bg-accent-500/10 flex items-center justify-center mb-5 group-hover:bg-accent-500/20 transition-colors">
+            <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="text-white font-semibold mb-2">Ready-to-Use CLI</h3>
+          <p class="text-surface-400 text-sm leading-relaxed">A command-line interface wrapping all client functionality for easy scripting, automation, and quick queries against Stellar testnet.</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="reveal reveal-delay-2 glow-card p-7 group">
+          <div class="w-11 h-11 rounded-xl bg-accent-500/10 flex items-center justify-center mb-5 group-hover:bg-accent-500/20 transition-colors">
+            <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <h3 class="text-white font-semibold mb-2">Working Examples</h3>
+          <p class="text-surface-400 text-sm leading-relaxed">Copy-pasteable quickstart examples that run against public Stellar testnet with zero configuration required.</p>
+        </div>
+        <!-- Card 4 -->
+        <div class="reveal glow-card p-7 group">
+          <div class="w-11 h-11 rounded-xl bg-accent-500/10 flex items-center justify-center mb-5 group-hover:bg-accent-500/20 transition-colors">
+            <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <h3 class="text-white font-semibold mb-2">Zero Dependencies</h3>
+          <p class="text-surface-400 text-sm leading-relaxed">No third-party packages. Only the Go standard library — keeping your dependency tree clean and build times fast.</p>
+        </div>
+        <!-- Card 5 -->
+        <div class="reveal reveal-delay-1 glow-card p-7 group">
+          <div class="w-11 h-11 rounded-xl bg-accent-500/10 flex items-center justify-center mb-5 group-hover:bg-accent-500/20 transition-colors">
+            <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          </div>
+          <h3 class="text-white font-semibold mb-2">CI Validated</h3>
+          <p class="text-surface-400 text-sm leading-relaxed">Tested in CI on every push. Type-safe, well-tested, and designed for production backend services.</p>
+        </div>
+        <!-- Card 6 -->
+        <div class="reveal reveal-delay-2 glow-card p-7 group">
+          <div class="w-11 h-11 rounded-xl bg-accent-500/10 flex items-center justify-center mb-5 group-hover:bg-accent-500/20 transition-colors">
+            <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+          </div>
+          <h3 class="text-white font-semibold mb-2">Contract Helpers</h3>
+          <p class="text-surface-400 text-sm leading-relaxed">High-level helper methods built on top of getLedgerEntries for easier contract state and instance reading.</p>
+        </div>
       </div>
     </div>
-  </header>
+  </section>
 
-  <main class="container mx-auto px-6 py-16">
-    <!-- Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-      <div class="stat-modern">
-        <div class="stat-number">4</div>
-        <div class="stat-label">Core RPC Methods</div>
+  <!-- QUICK START -->
+  <section id="quickstart" class="relative py-24 border-t border-white/5">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="reveal text-center mb-14">
+        <span class="text-xs font-semibold text-accent-400 uppercase tracking-widest mb-4 block">Quick Start</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Up and running in seconds</h2>
       </div>
-      <div class="stat-modern">
-        <div class="stat-number">100%</div>
-        <div class="stat-label">Test Covered</div>
-      </div>
-      <div class="stat-modern">
-        <div class="stat-number">0</div>
-        <div class="stat-label">External Deps</div>
-      </div>
-    </div>
 
-    <!-- Why Section -->
-    <section class="mb-24 text-center">
-      <h2 class="h2-modern mb-8">Why soroban-go-toolkit?</h2>
-      <p class="body-text-modern text-xl max-w-4xl mx-auto">
-        Most existing Soroban tooling targets Rust (<code class="bg-gray-100 dark:bg-gray-700 px-1 rounded-md font-mono">rs-soroban-sdk</code>) and JavaScript/TypeScript (<code class="bg-gray-100 dark:bg-gray-700 px-1 rounded-md font-mono">js-stellar-sdk</code>, <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded-md font-mono">soroban-react</code>). Go is where a lot of backend infrastructure actually lives — indexers, bots, monitoring, internal services — and Go developers reaching for Soroban have had to hand-roll JSON-RPC calls and wrestle XDR themselves.
-      </p>
-      <p class="body-text-modern text-xl max-w-4xl mx-auto mt-4">
-        This project fills that gap with idiomatic, typed Go bindings for the Stellar Soroban RPC API.
-      </p>
-    </section>
-
-    <!-- Features -->
-    <section class="mb-24">
-      <h2 class="h2-modern mb-12 text-center">Features</h2>
-      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-        <!-- Complete RPC Client -->
-        <div class="modern-card flex flex-col h-full">
-          <div class="feature-icon">
-            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-          </div>
-          <h3 class="text-xl font-bold mb-4 text-primary-600 dark:text-primary-400 flex-grow-0">Complete RPC Client</h3>
-          <p class="flex-1 text-gray-600 dark:text-gray-300 leading-relaxed mb-auto">
-            Typed request/response structs for getHealth, getLatestLedger, getContractData, and simulateTransaction with proper error handling.
-          </p>
+      <!-- Install commands -->
+      <div class="reveal space-y-3 mb-10">
+        <div class="flex items-center bg-surface-900 border border-white/8 rounded-xl overflow-hidden group hover:border-accent-500/25 transition-colors">
+          <span class="pl-4 text-surface-600 text-xs font-medium uppercase tracking-wider w-20 shrink-0">Library</span>
+          <code class="flex-1 px-4 py-3 font-mono text-sm text-surface-300 overflow-x-auto whitespace-nowrap">go get github.com/Northbound-Dev/soroban-go-toolkit</code>
+          <button onclick="copyCode(this.closest('.flex'))" class="px-4 py-3 text-surface-500 hover:text-accent-400 transition-colors border-l border-white/5 hover:bg-white/5 shrink-0">
+            <span class="copy-label text-xs font-medium">Copy</span>
+          </button>
         </div>
-
-        <!-- Ready-to-Use CLI -->
-        <div class="modern-card flex flex-col h-full">
-          <div class="feature-icon">
-            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-          </div>
-          <h3 class="text-xl font-bold mb-4 text-primary-600 dark:text-primary-400 flex-grow-0">Ready-to-Use CLI</h3>
-          <p class="flex-1 text-gray-600 dark:text-gray-300 leading-relaxed mb-auto">
-            Command-line interface wrapping all client functionality for easy scripting and automation.
-          </p>
-        </div>
-
-        <!-- Working Examples -->
-        <div class="modern-card flex flex-col h-full">
-          <div class="feature-icon">
-            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m2 0a2 2 0 100-4 2 2 0 000 4zm-9 3a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4zm4-6a2 2 0 100-4 2 2 0 000 4z"></path></svg>
-          </div>
-          <h3 class="text-xl font-bold mb-4 text-primary-600 dark:text-primary-400 flex-grow-0">Working Examples</h3>
-          <p class="flex-1 text-gray-600 dark:text-gray-300 leading-relaxed mb-auto">
-            Copy-pasteable quickstart examples that run against public Stellar testnet with zero configuration.
-          </p>
-        </div>
-
-        <!-- Production Ready -->
-        <div class="modern-card flex flex-col h-full">
-          <div class="feature-icon">
-            <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 011.946.806 3.42 3.42 0 003.142 1.825A5.403 5.403 0 019.75 9.75v-.086A5.41 5.41 0 009 8.256a5.41 5.41 0 00-3.757 2.565 3.42 3.42 0 003.142-1.825A3.42 3.42 0 015.256 6.33a3.42 3.42 0 00-.806-1.946z"></path></svg>
-          </div>
-          <h3 class="text-xl font-bold mb-4 text-primary-600 dark:text-primary-400 flex-grow-0">Production Ready</h3>
-          <p class="flex-1 text-gray-600 dark:text-gray-300 leading-relaxed mb-auto">
-            MIT licensed, well-tested, CI validated, and designed for backend services and infrastructure.
-          </p>
+        <div class="flex items-center bg-surface-900 border border-white/8 rounded-xl overflow-hidden group hover:border-accent-500/25 transition-colors">
+          <span class="pl-4 text-surface-600 text-xs font-medium uppercase tracking-wider w-20 shrink-0">CLI</span>
+          <code class="flex-1 px-4 py-3 font-mono text-sm text-surface-300 overflow-x-auto whitespace-nowrap">go install github.com/Northbound-Dev/soroban-go-toolkit/cmd/sorobango@latest</code>
+          <button onclick="copyCode(this.closest('.flex'))" class="px-4 py-3 text-surface-500 hover:text-accent-400 transition-colors border-l border-white/5 hover:bg-white/5 shrink-0">
+            <span class="copy-label text-xs font-medium">Copy</span>
+          </button>
         </div>
       </div>
-    </section>
 
-    <!-- CTA -->
-    <section class="text-center mb-24">
-      <h2 class="h2-modern mb-8">Get Started in Seconds</h2>
-      <div class="space-y-6 max-w-xl mx-auto">
-        <div class="flex flex-col items-start">
-          <label class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">go get</label>
-          <div class="w-full">
-            <code class="code-block block w-full" onclick="copyCode(this)">go get github.com/Northbound-Dev/soroban-go-toolkit</code>
+      <!-- Code example -->
+      <div class="reveal code-block">
+        <div class="code-header">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/70"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-green-500/70"></span>
           </div>
+          <span class="font-mono">main.go</span>
+          <button onclick="copyCode(this.closest('.code-block'))" class="text-surface-500 hover:text-accent-400 transition-colors">
+            <span class="copy-label">Copy</span>
+          </button>
         </div>
-        <div class="flex flex-col items-start">
-          <label class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">or install CLI</label>
-          <div class="w-full">
-            <code class="code-block block w-full" onclick="copyCode(this)">go install github.com/Northbound-Dev/soroban-go-toolkit/cmd/sorobango@latest</code>
-          </div>
-        </div>
-      </div>
-      <div class="flex flex-col md:flex-row justify-center gap-6 mt-10">
-        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" class="btn-modern-primary px-8 py-3">
-          View on GitHub
-        </a>
-        <a href="#installation" class="btn-modern-secondary px-8 py-3">
-          Installation Guide
-        </a>
-      </div>
-    </section>
+        <pre><code><span class="kw">package</span> main
 
-    <!-- Quick Start Example -->
-    <section class="mb-24">
-      <h2 class="h2-modern mb-8 text-center">Quick Start Example</h2>
-      <div class="code-block" onclick="copyCode(this)">
-        <pre><code>package main
+<span class="kw">import</span> (
+    <span class="str">"context"</span>
+    <span class="str">"fmt"</span>
+    <span class="str">"log"</span>
 
-import (
-	"context"
-	"fmt"
-	"log"
-
-	"github.com/Northbound-Dev/soroban-go-toolkit/pkg/soroban"
+    <span class="str">"github.com/Northbound-Dev/soroban-go-toolkit/pkg/soroban"</span>
 )
 
-func main() {
-	// With no options the client targets the public Stellar testnet.
-	client, err := soroban.New()
-	if err != nil {
-		log.Fatal(err)
-	}
+<span class="kw">func</span> <span class="fn">main</span>() {
+    <span class="cm">// With no options the client targets the public Stellar testnet.</span>
+    client, err := <span class="fn">soroban.New</span>()
+    <span class="kw">if</span> err != <span class="kw">nil</span> {
+        <span class="fn">log.Fatal</span>(err)
+    }
 
-	ctx := context.Background()
+    ctx := <span class="fn">context.Background</span>()
 
-	health, err := client.GetHealth(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("endpoint status:", health.Status)
+    health, err := client.<span class="fn">GetHealth</span>(ctx)
+    <span class="kw">if</span> err != <span class="kw">nil</span> {
+        <span class="fn">log.Fatal</span>(err)
+    }
+    fmt.<span class="fn">Println</span>(<span class="str">"endpoint status:"</span>, health.Status)
 
-	ledger, err := client.GetLatestLedger(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("latest ledger:  %d (protocol %d)\n", ledger.Sequence, ledger.ProtocolVersion)
+    ledger, err := client.<span class="fn">GetLatestLedger</span>(ctx)
+    <span class="kw">if</span> err != <span class="kw">nil</span> {
+        <span class="fn">log.Fatal</span>(err)
+    }
+    fmt.<span class="fn">Printf</span>(<span class="str">"latest ledger:  %d (protocol %d)\n"</span>, ledger.Sequence, ledger.ProtocolVersion)
 }</code></pre>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Supported RPC Methods -->
-    <section class="mb-24">
-      <h2 class="h2-modern mb-8 text-center">Supported RPC Methods</h2>
-      <div class="overflow-x-auto">
-        <table class="min-w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-600 overflow-hidden">
-          <thead class="bg-primary-50 dark:bg-primary-900">
-            <tr>
-              <th class="px-6 py-4 text-left text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">Stellar RPC Method</th>
-              <th class="px-6 py-4 text-left text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">Client Method</th>
-              <th class="px-6 py-4 text-left text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">CLI Command</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            <tr>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getHealth</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetHealth</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango health</td>
-            </tr>
-            <tr class="bg-gray-50 dark:bg-gray-700">
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getLatestLedger</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetLatestLedger</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango latest-ledger</td>
-            </tr>
-            <tr>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">getLedgerEntries</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetLedgerEntries</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango ledger-entries</td>
-            </tr>
-            <tr class="bg-gray-50 dark:bg-gray-700">
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">simulateTransaction</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">SimulateTransaction</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango simulate</td>
-            </tr>
-            <tr>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetContractData*</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetContractData</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango contract-data</td>
-            </tr>
-            <tr class="bg-gray-50 dark:bg-gray-700">
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetContractInstance*</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">GetContractInstance</td>
-              <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">sorobango contract-instance</td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-          <em>*Helper methods built on top of getLedgerEntries for easier contract state reading</em>
+  <!-- RPC METHODS TABLE -->
+  <section id="methods" class="relative py-24 border-t border-white/5">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="reveal text-center mb-14">
+        <span class="text-xs font-semibold text-accent-400 uppercase tracking-widest mb-4 block">API Reference</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Supported RPC Methods</h2>
+      </div>
+
+      <div class="reveal glow-card overflow-hidden" style="padding: 0;">
+        <div class="overflow-x-auto">
+          <table class="w-full table-modern text-sm">
+            <thead>
+              <tr>
+                <th class="px-6 py-4 text-left">Stellar RPC Method</th>
+                <th class="px-6 py-4 text-left">Client Method</th>
+                <th class="px-6 py-4 text-left">CLI Command</th>
+              </tr>
+            </thead>
+            <tbody class="text-surface-300">
+              <tr>
+                <td class="px-6 py-4 font-mono text-xs text-accent-400">getHealth</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-200">GetHealth</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-400">sorobango health</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 font-mono text-xs text-accent-400">getLatestLedger</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-200">GetLatestLedger</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-400">sorobango latest-ledger</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 font-mono text-xs text-accent-400">getLedgerEntries</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-200">GetLedgerEntries</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-400">sorobango ledger-entries</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 font-mono text-xs text-accent-400">simulateTransaction</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-200">SimulateTransaction</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-400">sorobango simulate</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 font-mono text-xs text-accent-400">GetContractData*</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-200">GetContractData</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-400">sorobango contract-data</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 font-mono text-xs text-accent-400">GetContractInstance*</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-200">GetContractInstance</td>
+                <td class="px-6 py-4 font-mono text-xs text-surface-400">sorobango contract-instance</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-6 py-4 border-t border-white/5">
+          <p class="text-xs text-surface-500 text-center">
+            * Helper methods built on top of <code class="font-mono text-surface-400">getLedgerEntries</code> for easier contract state reading
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="relative py-28 border-t border-white/5">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <div class="reveal">
+        <h2 class="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-5">Build on Stellar with Go</h2>
+        <p class="text-surface-400 text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+          Join the growing Stellar ecosystem. Start building powerful backend services, indexers, and infrastructure today.
         </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" target="_blank" class="btn-glow px-8 py-3.5 rounded-xl text-white font-medium text-sm inline-flex items-center gap-2">
+            Star on GitHub
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+          </a>
+          <a href="#quickstart" class="px-8 py-3.5 rounded-xl text-surface-300 font-medium text-sm border border-white/10 hover:border-white/20 hover:text-white transition-all">
+            Read the Docs →
+          </a>
+        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Join Stellar Ecosystem -->
-    <section class="text-center">
-      <h2 class="h2-modern mb-8">Join the Stellar Ecosystem</h2>
-      <p class="body-text-modern text-xl max-w-3xl mx-auto">
-        soroban-go-toolkit is part of the growing Stellar ecosystem, enabling Go developers to build powerful backend services, indexers, and infrastructure on the Soroban smart contract platform.
-      </p>
-      <div class="mt-12">
-        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit" class="btn-modern-primary px-8 py-3">
-          Star on GitHub →
-        </a>
-      </div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer class="border-t border-gray-200 dark:border-gray-700">
-    <div class="container mx-auto px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
-      <p>&copy; 2026 soroban-go-toolkit. Licensed under <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/blob/main/LICENSE" class="text-primary-600 dark:text-primary-400 hover:underline font-medium transition-colors duration-300">MIT License</a>.</p>
-      <p class="mt-4">
-        <a href="https://stellar.org" class="text-primary-600 dark:text-primary-400 hover:underline font-medium transition-colors duration-300">Stellar Ecosystem</a> |
-        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/issues" class="text-primary-600 dark:text-primary-400 hover:underline font-medium transition-colors duration-300">Issues</a> |
-        <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/discussions" class="text-primary-600 dark:text-primary-400 hover:underline font-medium transition-colors duration-300">Discussions</a>
-      </p>
-      <div class="mt-6 flex justify-center space-x-4">
-        <a href="#" onclick="toggleTheme()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646M9.75 9.75a4.5 4.5 0 000 6.364M9.75 9.75a4.5 4.5 0 010 6.364M12 15a3 3 0 110-6M12 3a3 3 0 100 6"/>
-          </svg>
-        </a>
-        <span class="text-xs">Toggle theme</span>
+  <!-- FOOTER -->
+  <footer class="border-t border-white/5 py-10">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-6 h-6 rounded-md bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center text-white text-[10px] font-bold">S</div>
+          <span class="text-surface-500 text-sm">soroban-go-toolkit</span>
+        </div>
+        <div class="flex items-center gap-6 text-sm text-surface-500">
+          <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/blob/main/LICENSE" target="_blank" class="hover:text-surface-300 transition-colors">MIT License</a>
+          <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/issues" target="_blank" class="hover:text-surface-300 transition-colors">Issues</a>
+          <a href="https://github.com/Northbound-Dev/soroban-go-toolkit/discussions" target="_blank" class="hover:text-surface-300 transition-colors">Discussions</a>
+          <a href="https://stellar.org" target="_blank" class="hover:text-surface-300 transition-colors">Stellar</a>
+        </div>
+        <span class="text-surface-600 text-xs">© 2026</span>
       </div>
     </div>
   </footer>
+
 </body>
 </html>
