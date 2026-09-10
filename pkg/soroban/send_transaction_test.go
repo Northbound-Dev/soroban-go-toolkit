@@ -14,15 +14,15 @@ func TestSendTransaction(t *testing.T) {
 		wantFee    uint32
 	}{
 		{
-			name:    "successful transaction",
-			result:  `{"hash":"a1b2c3d4e5f6789012345678901234567890123456789012345678901234567890","latestLedger":1339385,"feeCharged":100,"memoXDR":"AAAAAQ==","sorobanMetaXDR":"AAAAAg==","resultXDR":"AAAAAAAAAQ==","feeMetaXDR":"AAAAAg=="}`,
+			name:       "successful transaction",
+			result:     `{"hash":"a1b2c3d4e5f6789012345678901234567890123456789012345678901234567890","latestLedger":1339385,"feeCharged":100,"memoXDR":"AAAAAQ==","sorobanMetaXDR":"AAAAAg==","resultXDR":"AAAAAAAAAQ==","feeMetaXDR":"AAAAAg=="}`,
 			wantHash:   "a1b2c3d4e5f6789012345678901234567890123456789012345678901234567890",
 			wantLedger: 1339385,
 			wantFee:    100,
 		},
 		{
-			name:    "transaction with no memo or soroban meta",
-			result:  `{"hash":"b2c3d4e5f67890123456789012345678901234567890123456789012345678901c","latestLedger":1339386,"feeCharged":150,"resultXDR":"AAAAAAAAAg==","feeMetaXDR":"AAAAAw=="}`,
+			name:       "transaction with no memo or soroban meta",
+			result:     `{"hash":"b2c3d4e5f67890123456789012345678901234567890123456789012345678901c","latestLedger":1339386,"feeCharged":150,"resultXDR":"AAAAAAAAAg==","feeMetaXDR":"AAAAAw=="}`,
 			wantHash:   "b2c3d4e5f67890123456789012345678901234567890123456789012345678901c",
 			wantLedger: 1339386,
 			wantFee:    150,

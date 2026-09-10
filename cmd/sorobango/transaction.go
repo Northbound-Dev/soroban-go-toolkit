@@ -15,18 +15,18 @@ import (
 // and tied to the SDK's internal representation. Declaring the output
 // explicitly keeps --json a stable contract for scripts.
 type transactionOutput struct {
-	LatestLedger   uint32 `json:"latestLedger"`
-	Hash           string `json:"hash"`
-	Ledger         uint32 `json:"ledger"`
-	CreatedAt      uint64 `json:"createdAt"`
-	FeePaid        uint32 `json:"feePaid"`
-	MaxFee         uint32 `json:"maxFee"`
-	OperationCount uint32 `json:"operationCount"`
-	EnvelopeXDR    string `json:"envelopeXdr"`
-	ResultMetaXDR  string `json:"resultMetaXdr"`
-	FeeMetaXDR     string `json:"feeMetaXdr"`
-	Memo           string `json:"memo"`
-	Signatures     []string `json:"signatures,omitempty"`
+	LatestLedger   uint32            `json:"latestLedger"`
+	Hash           string            `json:"hash"`
+	Ledger         uint32            `json:"ledger"`
+	CreatedAt      uint64            `json:"createdAt"`
+	FeePaid        uint32            `json:"feePaid"`
+	MaxFee         uint32            `json:"maxFee"`
+	OperationCount uint32            `json:"operationCount"`
+	EnvelopeXDR    string            `json:"envelopeXdr"`
+	ResultMetaXDR  string            `json:"resultMetaXdr"`
+	FeeMetaXDR     string            `json:"feeMetaXdr"`
+	Memo           string            `json:"memo"`
+	Signatures     []string          `json:"signatures,omitempty"`
 	TimeBounds     *TimeBoundsOutput `json:"timeBounds,omitempty"`
 }
 

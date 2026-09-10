@@ -34,24 +34,24 @@ func readSendEnvelope(cmd *cobra.Command, arg string) (string, error) {
 // and tied to the SDK's internal representation. Declaring the output
 // explicitly keeps --json a stable contract for scripts.
 type sendOutput struct {
-	Hash         string `json:"hash"`
-	LatestLedger uint32 `json:"latestLedger"`
-	FeeCharged   uint32 `json:"feeCharged"`
-	MemoXDR      string `json:"memoXdr,omitempty"`
+	Hash           string `json:"hash"`
+	LatestLedger   uint32 `json:"latestLedger"`
+	FeeCharged     uint32 `json:"feeCharged"`
+	MemoXDR        string `json:"memoXdr,omitempty"`
 	SorobanMetaXDR string `json:"sorobanMetaXdr,omitempty"`
-	ResultXDR    string `json:"resultXdr"`
-	FeeMetaXDR   string `json:"feeMetaXdr"`
+	ResultXDR      string `json:"resultXdr"`
+	FeeMetaXDR     string `json:"feeMetaXdr"`
 }
 
 func newSendOutput(resp *soroban.SendTransactionResponse) sendOutput {
 	return sendOutput{
-		Hash:         resp.Hash,
-		LatestLedger: resp.LatestLedger,
-		FeeCharged:   resp.FeeCharged,
-		MemoXDR:      resp.MemoXDR,
+		Hash:           resp.Hash,
+		LatestLedger:   resp.LatestLedger,
+		FeeCharged:     resp.FeeCharged,
+		MemoXDR:        resp.MemoXDR,
 		SorobanMetaXDR: resp.SorobanMetaXDR,
-		ResultXDR:    resp.ResultXDR,
-		FeeMetaXDR:   resp.FeeMetaXDR,
+		ResultXDR:      resp.ResultXDR,
+		FeeMetaXDR:     resp.FeeMetaXDR,
 	}
 }
 
