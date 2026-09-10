@@ -30,7 +30,7 @@ jobs:
           node-version: '24'
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           # Read from go.mod so the CI toolchain cannot drift from the module's
           # declared version.
@@ -78,7 +78,7 @@ jobs:
           node-version: '24'
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
 
