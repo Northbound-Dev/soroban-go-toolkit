@@ -91,13 +91,14 @@ func parseEventOrder(value string) (string, error) {
 // newEventsCommand creates the sorobango events command.
 func newEventsCommand(opts *options) *cobra.Command {
 	var (
-		cursor      string
-		limit       int32
-		order       string
-		contractIDs stringsliceValue
-		eventTypes  stringsliceValue
-		startLedger uint32
-		stopLedger  uint32
+		cursor        string
+		limit         int32
+		order         string
+		contractIDs   stringsliceValue
+		eventTypes    stringsliceValue
+		startLedger   uint32
+		stopLedger    uint32
+		transactionID string
 	)
 
 	cmd := &cobra.Command{
@@ -116,12 +117,13 @@ activity, or analyzing contract behavior over time.`,
 			}
 
 			var filters *soroban.EventFilters
-			if len(contractIDs) > 0 || len(eventTypes) > 0 || startLedger > 0 || stopLedger > 0 {
+			if len(contractIDs) > 0 || len(eventTypes) > 0 || startLedger > 0 || stopLedger > 0 || transactionID != "" {
 				filters = &soroban.EventFilters{
-					ContractIDs: contractIDs,
-					Types:       eventTypes,
-					StartLedger: startLedger,
-					StopLedger:  stopLedger,
+					ContractIDs:   contractIDs,
+					Types:         eventTypes,
+					StartLedger:   startLedger,
+					StopLedger:    stopLedger,
+					TransactionID: transactionID,
 				}
 				// If both StartLedger/StopLedger and LedgerBounds are set,
 				// StartLedger/StopLedger takes precedence (more specific)
@@ -154,6 +156,7 @@ activity, or analyzing contract behavior over time.`,
 	flags.Var(&eventTypes, "type", "event type to filter by (can be repeated)")
 	flags.Uint32Var(&startLedger, "start-ledger", 0, "minimum ledger (inclusive) to consider")
 	flags.Uint32Var(&stopLedger, "stop-ledger", 0, "maximum ledger (inclusive) to consider")
+	flags.StringVar(&transactionID, "transaction-id", "", "transaction hash to filter events by")
 
 	return cmd
 }

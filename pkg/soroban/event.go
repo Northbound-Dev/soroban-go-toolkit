@@ -55,6 +55,8 @@ type EventFilters struct {
 
 	// StopLedger is the maximum ledger (inclusive) to consider.
 	StopLedger uint32 `json:"stopLedger,omitempty"`
+	// TransactionID is the transaction hash to filter events by.
+	TransactionID string `json:"txId,omitempty"`
 
 	// LedgerBounds specifies a ledger range to consider.
 	LedgerBounds *LedgerBounds `json:"ledgerBounds,omitempty"`
