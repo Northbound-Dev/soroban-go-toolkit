@@ -299,6 +299,11 @@ See the [`examples/`](examples/) directory for runnable examples that you can ad
 | `getLatestLedger` | `GetLatestLedger` | `sorobango latest-ledger` |
 | `getLedgerEntries` | `GetLedgerEntries` | `sorobango ledger-entries` |
 | `simulateTransaction` | `SimulateTransaction` | `sorobango simulate` |
+| `sendTransaction` | `SendTransaction` | `sorobango send` |
+| `getTransaction` | `GetTransaction` | `sorobango get-tx` |
+| `getEvents` | `GetEvents` | `sorobango events` |
+| `getNetwork` | `GetNetwork` | `sorobango network` |
+| `getVersionInfo` | `GetVersionInfo` | `sorobango version` |
 
 Built on top of `getLedgerEntries`, for reading contract state without
 constructing XDR by hand:
@@ -320,6 +325,11 @@ on failure so it composes in scripts.
 ```sh
 sorobango health
 sorobango latest-ledger --json
+sorobango send - < envelope.txt
+sorobango get-tx <transaction-hash>
+sorobango events
+sorobango network
+sorobango version
 sorobango contract-data CXXX...  COUNTER --durability persistent
 sorobango contract-instance CXXX...
 sorobango simulate - < envelope.txt
@@ -334,10 +344,6 @@ itself fails even though the RPC call succeeded.
 
 These are tracked as issues and are good places to start contributing:
 
-- `getEvents` — contract event queries
-- `getTransaction` — transaction status and result lookup
-- `sendTransaction` — transaction submission
-- `getNetwork` and `getVersionInfo` — endpoint metadata
 - Typed decoding for structured `ScVal` values (maps, vectors, `i128`/`u256`)
 
 

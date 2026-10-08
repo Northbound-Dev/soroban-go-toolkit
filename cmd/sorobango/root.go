@@ -62,6 +62,8 @@ the URL of an RPC instance you run yourself or obtain from a provider.`,
 		newSendCommand(opts),
 		newTransactionCommand(opts),
 		newEventsCommand(opts),
+		newNetworkCommand(opts),
+		newVersionInfoCommand(opts),
 	)
 
 	return root
