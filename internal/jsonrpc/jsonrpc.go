@@ -72,15 +72,20 @@ type response struct {
 // Client performs JSON-RPC calls against a single endpoint. It is safe for
 // concurrent use by multiple goroutines.
 type Client struct {
-	url    string
-	http   *http.Client
-	lastID atomic.Uint64
+	url     string
+	http    *http.Client
+	headers map[string]string
+	lastID  atomic.Uint64
 }
 
-// NewClient returns a Client that posts to url using httpClient, which must not
-// be nil.
-func NewClient(url string, httpClient *http.Client) *Client {
-	return &Client{url: url, http: httpClient}
+// NewClient returns a Client that posts to url using httpClient and optional headers.
+// httpClient must not be nil.
+func NewClient(url string, httpClient *http.Client, headers map[string]string) *Client {
+	h := make(map[string]string, len(headers))
+	for k, v := range headers {
+		h[k] = v
+	}
+	return &Client{url: url, http: httpClient, headers: h}
 }
 
 // Call invokes method with params and decodes the result into out. A nil out
@@ -100,6 +105,9 @@ func (c *Client) Call(ctx context.Context, method string, params, out any) error
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Accept", "application/json")
+	for k, v := range c.headers {
+		httpReq.Header.Set(k, v)
+	}
 
 	httpResp, err := c.http.Do(httpReq)
 	if err != nil {

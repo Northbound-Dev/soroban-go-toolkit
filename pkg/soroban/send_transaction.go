@@ -5,46 +5,85 @@ import (
 	"fmt"
 )
 
+// Stellar RPC sendTransaction status constants.
+const (
+	SendStatusPending       = "PENDING"
+	SendStatusDuplicate     = "DUPLICATE"
+	SendStatusTryAgainLater = "TRY_AGAIN_LATER"
+	SendStatusError         = "ERROR"
+)
+
 // SendTransactionResponse is the result of sendTransaction.
 type SendTransactionResponse struct {
+	// Status is the transaction's submission status: PENDING, DUPLICATE,
+	// TRY_AGAIN_LATER, or ERROR.
+	Status string `json:"status,omitempty"`
+
 	// Hash is the transaction hash, hex encoded.
 	Hash string `json:"hash"`
 
-	// LatestLedger is the ledger the transaction was included in.
+	// LatestLedger is the sequence number of the latest ledger known to the RPC node.
 	LatestLedger uint32 `json:"latestLedger"`
 
-	// FeeCharged is the fee actually charged for the transaction, in stroops.
-	FeeCharged uint32 `json:"feeCharged"`
+	// LatestLedgerCloseTime is the unix timestamp of the latest ledger close time.
+	LatestLedgerCloseTime string `json:"latestLedgerCloseTime,omitempty"`
 
-	// Memo is the memo is returned if the transaction had a memo.
-	MemoXDR string `json:"memoXdr,omitempty"`
+	// ErrorResultXDR is returned if status is ERROR, providing the base64-encoded
+	// TransactionResult XDR.
+	ErrorResultXDR string `json:"errorResultXdr,omitempty"`
 
-	// SorobanMeta is returned if the transaction invoked any smart contracts.
+	// DiagnosticEventsXDR holds base64 XDR DiagnosticEvent values explaining why
+	// a transaction submission failed.
+	DiagnosticEventsXDR []string `json:"diagnosticEventsXdr,omitempty"`
+
+	// Legacy / extended fields:
+	FeeCharged     uint32 `json:"feeCharged,omitempty"`
+	MemoXDR        string `json:"memoXdr,omitempty"`
 	SorobanMetaXDR string `json:"sorobanMetaXdr,omitempty"`
+	ResultXDR      string `json:"resultXdr,omitempty"`
+	FeeMetaXDR     string `json:"feeMetaXdr,omitempty"`
+}
 
-	// ResultXDR is the base64-encoded TransactionResult.
-	ResultXDR string `json:"resultXdr"`
+// IsPending reports whether the transaction was accepted into the mempool.
+func (r *SendTransactionResponse) IsPending() bool {
+	return r.Status == SendStatusPending
+}
 
-	// FeeMetaXDR is the base64-encoded TransactionMeta for the fee charged.
-	FeeMetaXDR string `json:"feeMetaXdr"`
+// IsError reports whether the transaction submission was rejected.
+func (r *SendTransactionResponse) IsError() bool {
+	return r.Status == SendStatusError
+}
+
+// IsDuplicate reports whether the transaction was already submitted.
+func (r *SendTransactionResponse) IsDuplicate() bool {
+	return r.Status == SendStatusDuplicate
+}
+
+// IsTryAgainLater reports whether the node temporarily rejected the transaction.
+func (r *SendTransactionResponse) IsTryAgainLater() bool {
+	return r.Status == SendStatusTryAgainLater
 }
 
 // SendTransaction calls sendTransaction to submit a signed transaction
 // to the Stellar network for inclusion in a ledger.
 //
 // envelopeXDR is a base64 XDR TransactionEnvelope that must be fully signed.
-// The transaction will be validated and, if valid, submitted to the network.
+// The transaction will be validated and, if valid, enqueued for ledger inclusion.
 //
-// A successful submission does not guarantee the transaction succeeded -
-// it only means the transaction was accepted for inclusion in a ledger.
-// To determine if the transaction succeeded, check the ResultXDR field.
+// To check whether the transaction was successfully processed by the ledger,
+// poll GetTransaction or use SendAndAwaitTransaction.
 func (c *Client) SendTransaction(ctx context.Context, envelopeXDR string) (*SendTransactionResponse, error) {
 	if envelopeXDR == "" {
 		return nil, fmt.Errorf("soroban: sendTransaction requires a transaction envelope")
 	}
 
 	var out SendTransactionResponse
-	if err := c.call(ctx, "sendTransaction", map[string]string{"tx": envelopeXDR}, &out); err != nil {
+	// Send "transaction" (standard Stellar RPC) and "tx" (legacy alias)
+	params := map[string]string{
+		"transaction": envelopeXDR,
+		"tx":          envelopeXDR,
+	}
+	if err := c.call(ctx, "sendTransaction", params, &out); err != nil {
 		return nil, err
 	}
 	return &out, nil

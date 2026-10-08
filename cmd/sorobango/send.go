@@ -34,39 +34,65 @@ func readSendEnvelope(cmd *cobra.Command, arg string) (string, error) {
 // and tied to the SDK's internal representation. Declaring the output
 // explicitly keeps --json a stable contract for scripts.
 type sendOutput struct {
-	Hash           string `json:"hash"`
-	LatestLedger   uint32 `json:"latestLedger"`
-	FeeCharged     uint32 `json:"feeCharged"`
-	MemoXDR        string `json:"memoXdr,omitempty"`
-	SorobanMetaXDR string `json:"sorobanMetaXdr,omitempty"`
-	ResultXDR      string `json:"resultXdr"`
-	FeeMetaXDR     string `json:"feeMetaXdr"`
+	Status                string   `json:"status,omitempty"`
+	Hash                  string   `json:"hash"`
+	LatestLedger          uint32   `json:"latestLedger"`
+	LatestLedgerCloseTime string   `json:"latestLedgerCloseTime,omitempty"`
+	ErrorResultXDR        string   `json:"errorResultXdr,omitempty"`
+	DiagnosticEventsXDR   []string `json:"diagnosticEventsXdr,omitempty"`
+	FeeCharged            uint32   `json:"feeCharged,omitempty"`
+	MemoXDR               string   `json:"memoXdr,omitempty"`
+	SorobanMetaXDR        string   `json:"sorobanMetaXdr,omitempty"`
+	ResultXDR             string   `json:"resultXdr,omitempty"`
+	FeeMetaXDR            string   `json:"feeMetaXdr,omitempty"`
 }
 
 func newSendOutput(resp *soroban.SendTransactionResponse) sendOutput {
 	return sendOutput{
-		Hash:           resp.Hash,
-		LatestLedger:   resp.LatestLedger,
-		FeeCharged:     resp.FeeCharged,
-		MemoXDR:        resp.MemoXDR,
-		SorobanMetaXDR: resp.SorobanMetaXDR,
-		ResultXDR:      resp.ResultXDR,
-		FeeMetaXDR:     resp.FeeMetaXDR,
+		Status:                resp.Status,
+		Hash:                  resp.Hash,
+		LatestLedger:          resp.LatestLedger,
+		LatestLedgerCloseTime: resp.LatestLedgerCloseTime,
+		ErrorResultXDR:        resp.ErrorResultXDR,
+		DiagnosticEventsXDR:   resp.DiagnosticEventsXDR,
+		FeeCharged:            resp.FeeCharged,
+		MemoXDR:               resp.MemoXDR,
+		SorobanMetaXDR:        resp.SorobanMetaXDR,
+		ResultXDR:             resp.ResultXDR,
+		FeeMetaXDR:            resp.FeeMetaXDR,
 	}
 }
 
 func printSend(w io.Writer, out sendOutput) {
+	if out.Status != "" {
+		fmt.Fprintf(w, "status:         %s\n", out.Status)
+	}
 	fmt.Fprintf(w, "hash:           %s\n", out.Hash)
 	fmt.Fprintf(w, "latest ledger:  %d\n", out.LatestLedger)
-	fmt.Fprintf(w, "fee charged:    %d stroops\n", out.FeeCharged)
+	if out.LatestLedgerCloseTime != "" {
+		fmt.Fprintf(w, "close time:     %s\n", out.LatestLedgerCloseTime)
+	}
+	if out.ErrorResultXDR != "" {
+		fmt.Fprintf(w, "error result:   %s\n", out.ErrorResultXDR)
+	}
+	if len(out.DiagnosticEventsXDR) > 0 {
+		fmt.Fprintf(w, "events:         %d diagnostic event(s)\n", len(out.DiagnosticEventsXDR))
+	}
+	if out.FeeCharged > 0 {
+		fmt.Fprintf(w, "fee charged:    %d stroops\n", out.FeeCharged)
+	}
 	if out.MemoXDR != "" {
 		fmt.Fprintf(w, "memo XDR:       %s\n", out.MemoXDR)
 	}
 	if out.SorobanMetaXDR != "" {
 		fmt.Fprintf(w, "soroban meta XDR: %s\n", out.SorobanMetaXDR)
 	}
-	fmt.Fprintf(w, "result XDR:     %s\n", out.ResultXDR)
-	fmt.Fprintf(w, "fee meta XDR:   %s\n", out.FeeMetaXDR)
+	if out.ResultXDR != "" {
+		fmt.Fprintf(w, "result XDR:     %s\n", out.ResultXDR)
+	}
+	if out.FeeMetaXDR != "" {
+		fmt.Fprintf(w, "fee meta XDR:   %s\n", out.FeeMetaXDR)
+	}
 }
 
 // newSendCommand creates the sorobango send command.

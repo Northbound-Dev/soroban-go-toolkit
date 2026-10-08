@@ -15,19 +15,23 @@ import (
 // and tied to the SDK's internal representation. Declaring the output
 // explicitly keeps --json a stable contract for scripts.
 type transactionOutput struct {
-	LatestLedger   uint32            `json:"latestLedger"`
-	Hash           string            `json:"hash"`
-	Ledger         uint32            `json:"ledger"`
-	CreatedAt      uint64            `json:"createdAt"`
-	FeePaid        uint32            `json:"feePaid"`
-	MaxFee         uint32            `json:"maxFee"`
-	OperationCount uint32            `json:"operationCount"`
-	EnvelopeXDR    string            `json:"envelopeXdr"`
-	ResultMetaXDR  string            `json:"resultMetaXdr"`
-	FeeMetaXDR     string            `json:"feeMetaXdr"`
-	Memo           string            `json:"memo"`
-	Signatures     []string          `json:"signatures,omitempty"`
-	TimeBounds     *TimeBoundsOutput `json:"timeBounds,omitempty"`
+	Status                string            `json:"status,omitempty"`
+	LatestLedger          uint32            `json:"latestLedger"`
+	LatestLedgerCloseTime string            `json:"latestLedgerCloseTime,omitempty"`
+	OldestLedger          uint32            `json:"oldestLedger,omitempty"`
+	Hash                  string            `json:"hash,omitempty"`
+	Ledger                uint32            `json:"ledger,omitempty"`
+	CreatedAt             uint64            `json:"createdAt,omitempty"`
+	FeePaid               uint32            `json:"feePaid,omitempty"`
+	MaxFee                uint32            `json:"maxFee,omitempty"`
+	OperationCount        uint32            `json:"operationCount,omitempty"`
+	EnvelopeXDR           string            `json:"envelopeXdr,omitempty"`
+	ResultXDR             string            `json:"resultXdr,omitempty"`
+	ResultMetaXDR         string            `json:"resultMetaXdr,omitempty"`
+	FeeMetaXDR            string            `json:"feeMetaXdr,omitempty"`
+	Memo                  string            `json:"memo,omitempty"`
+	Signatures            []string          `json:"signatures,omitempty"`
+	TimeBounds            *TimeBoundsOutput `json:"timeBounds,omitempty"`
 }
 
 // TimeBoundsOutput is the CLI's own JSON shape for time bounds.
@@ -46,34 +50,64 @@ func newTransactionOutput(resp *soroban.TransactionResponse) transactionOutput {
 	}
 
 	return transactionOutput{
-		LatestLedger:   resp.LatestLedger,
-		Hash:           resp.Hash,
-		Ledger:         resp.Ledger,
-		CreatedAt:      resp.CreatedAt,
-		FeePaid:        resp.FeePaid,
-		MaxFee:         resp.MaxFee,
-		OperationCount: resp.OperationCount,
-		EnvelopeXDR:    resp.EnvelopeXDR,
-		ResultMetaXDR:  resp.ResultMetaXDR,
-		FeeMetaXDR:     resp.FeeMetaXDR,
-		Memo:           resp.Memo,
-		Signatures:     resp.Signatures,
-		TimeBounds:     timeBounds,
+		Status:                resp.Status,
+		LatestLedger:          resp.LatestLedger,
+		LatestLedgerCloseTime: resp.LatestLedgerCloseTime,
+		OldestLedger:          resp.OldestLedger,
+		Hash:                  resp.Hash,
+		Ledger:                resp.Ledger,
+		CreatedAt:             resp.CreatedAt,
+		FeePaid:               resp.FeePaid,
+		MaxFee:                resp.MaxFee,
+		OperationCount:        resp.OperationCount,
+		EnvelopeXDR:           resp.EnvelopeXDR,
+		ResultXDR:             resp.ResultXDR,
+		ResultMetaXDR:         resp.ResultMetaXDR,
+		FeeMetaXDR:            resp.FeeMetaXDR,
+		Memo:                  resp.Memo,
+		Signatures:            resp.Signatures,
+		TimeBounds:            timeBounds,
 	}
 }
 
 func printTransaction(w io.Writer, out transactionOutput) {
+	if out.Status != "" {
+		fmt.Fprintf(w, "status:          %s\n", out.Status)
+	}
 	fmt.Fprintf(w, "latest ledger:   %d\n", out.LatestLedger)
-	fmt.Fprintf(w, "hash:            %s\n", out.Hash)
-	fmt.Fprintf(w, "ledger:          %d\n", out.Ledger)
-	fmt.Fprintf(w, "created at:      %d\n", out.CreatedAt)
-	fmt.Fprintf(w, "fee paid:        %d stroops\n", out.FeePaid)
-	fmt.Fprintf(w, "max fee:         %d stroops\n", out.MaxFee)
-	fmt.Fprintf(w, "operation count: %d\n", out.OperationCount)
-	fmt.Fprintf(w, "envelope XDR:    %s\n", out.EnvelopeXDR)
-	fmt.Fprintf(w, "result meta XDR: %s\n", out.ResultMetaXDR)
-	fmt.Fprintf(w, "fee meta XDR:    %s\n", out.FeeMetaXDR)
-	fmt.Fprintf(w, "memo:            %s\n", out.Memo)
+	if out.Hash != "" {
+		fmt.Fprintf(w, "hash:            %s\n", out.Hash)
+	}
+	if out.Ledger > 0 {
+		fmt.Fprintf(w, "ledger:          %d\n", out.Ledger)
+	}
+	if out.CreatedAt > 0 {
+		fmt.Fprintf(w, "created at:      %d\n", out.CreatedAt)
+	}
+	if out.FeePaid > 0 {
+		fmt.Fprintf(w, "fee paid:        %d stroops\n", out.FeePaid)
+	}
+	if out.MaxFee > 0 {
+		fmt.Fprintf(w, "max fee:         %d stroops\n", out.MaxFee)
+	}
+	if out.OperationCount > 0 {
+		fmt.Fprintf(w, "operation count: %d\n", out.OperationCount)
+	}
+	if out.ResultXDR != "" {
+		fmt.Fprintf(w, "result XDR:      %s\n", out.ResultXDR)
+	}
+	if out.EnvelopeXDR != "" {
+		fmt.Fprintf(w, "envelope XDR:    %s\n", out.EnvelopeXDR)
+	}
+	if out.ResultMetaXDR != "" {
+		fmt.Fprintf(w, "result meta XDR: %s\n", out.ResultMetaXDR)
+	}
+	if out.FeeMetaXDR != "" {
+		fmt.Fprintf(w, "fee meta XDR:    %s\n", out.FeeMetaXDR)
+	}
+	if out.Memo != "" {
+		fmt.Fprintf(w, "memo:            %s\n", out.Memo)
+	}
 	if len(out.Signatures) > 0 {
 		fmt.Fprintf(w, "signatures:      %d\n", len(out.Signatures))
 		for i, sig := range out.Signatures {

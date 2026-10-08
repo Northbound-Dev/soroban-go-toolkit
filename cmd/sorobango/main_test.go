@@ -315,3 +315,71 @@ func TestFormatScValFallsBackToXDR(t *testing.T) {
 		t.Errorf("formatScVal() could not encode the value: %s", got)
 	}
 }
+
+func TestFeeStatsCommand(t *testing.T) {
+	const result = `{
+		"latestLedger": 1339400,
+		"sorobanInclusionFee": {
+			"max": "50000",
+			"min": "100",
+			"mode": "100",
+			"p50": "100",
+			"p90": "500",
+			"p99": "5000",
+			"transactionCount": 42,
+			"ledgerCount": 10
+		},
+		"inclusionFee": {
+			"max": "10000",
+			"min": "100",
+			"mode": "100",
+			"p50": "100",
+			"p90": "100",
+			"p99": "200",
+			"transactionCount": 120,
+			"ledgerCount": 10
+		}
+	}`
+
+	out, err := runCommand(t, serveRPCResult(t, result), nil, "fee-stats")
+	if err != nil {
+		t.Fatalf("fee-stats returned error: %v\noutput:\n%s", err, out)
+	}
+
+	for _, want := range []string{"1339400", "50000", "Soroban", "Classic"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("output does not mention %q:\n%s", want, out)
+		}
+	}
+}
+
+func TestGetTransactionsCommand(t *testing.T) {
+	const result = `{
+		"latestLedger": 1050,
+		"oldestLedger": 900,
+		"cursor": "next_cursor_123",
+		"transactions": [
+			{
+				"status": "SUCCESS",
+				"applicationOrder": 1,
+				"feeBump": false,
+				"envelopeXdr": "AAAAAgAAAA==",
+				"resultXdr": "AAAAAQ==",
+				"resultMetaXdr": "AAAAAg==",
+				"ledger": 1000,
+				"createdAt": 1609459200
+			}
+		]
+	}`
+
+	out, err := runCommand(t, serveRPCResult(t, result), nil, "get-transactions", "--start-ledger", "1000")
+	if err != nil {
+		t.Fatalf("get-transactions returned error: %v\noutput:\n%s", err, out)
+	}
+
+	for _, want := range []string{"1050", "1000", "SUCCESS", "next_cursor_123"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("output does not mention %q:\n%s", want, out)
+		}
+	}
+}

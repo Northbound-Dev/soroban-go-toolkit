@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -16,6 +17,7 @@ var version = "dev"
 type options struct {
 	rpcURL  string
 	timeout time.Duration
+	headers []string
 	asJSON  bool
 }
 
@@ -23,10 +25,17 @@ type options struct {
 // that a bad --rpc-url is reported when a command actually runs, rather than
 // during flag parsing where the error would read as a usage problem.
 func (o *options) client() (*soroban.Client, error) {
-	return soroban.New(
+	opts := []soroban.Option{
 		soroban.WithURL(o.rpcURL),
 		soroban.WithTimeout(o.timeout),
-	)
+	}
+	for _, h := range o.headers {
+		parts := strings.SplitN(h, ":", 2)
+		if len(parts) == 2 {
+			opts = append(opts, soroban.WithHeader(strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])))
+		}
+	}
+	return soroban.New(opts...)
 }
 
 func newRootCommand() *cobra.Command {
@@ -50,6 +59,7 @@ the URL of an RPC instance you run yourself or obtain from a provider.`,
 	flags := root.PersistentFlags()
 	flags.StringVar(&opts.rpcURL, "rpc-url", soroban.TestnetURL, "Stellar RPC endpoint to query")
 	flags.DurationVar(&opts.timeout, "timeout", soroban.DefaultTimeout, "per-request timeout")
+	flags.StringArrayVarP(&opts.headers, "header", "H", nil, "pass custom HTTP header 'Key: Value' (repeatable)")
 	flags.BoolVar(&opts.asJSON, "json", false, "print the raw response as JSON")
 
 	root.AddCommand(
@@ -61,9 +71,11 @@ the URL of an RPC instance you run yourself or obtain from a provider.`,
 		newSimulateCommand(opts),
 		newSendCommand(opts),
 		newTransactionCommand(opts),
+		newTransactionsCommand(opts),
 		newEventsCommand(opts),
 		newNetworkCommand(opts),
 		newVersionInfoCommand(opts),
+		newFeeStatsCommand(opts),
 	)
 
 	return root

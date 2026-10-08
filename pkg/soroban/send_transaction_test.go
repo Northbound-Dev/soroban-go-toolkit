@@ -65,3 +65,25 @@ func TestSendTransactionRequiresEnvelope(t *testing.T) {
 	}
 	// Error is expected from validation, so we don't check captured request
 }
+
+func TestSendTransactionStatusHelpers(t *testing.T) {
+	pending := &SendTransactionResponse{Status: SendStatusPending}
+	if !pending.IsPending() || pending.IsError() || pending.IsDuplicate() || pending.IsTryAgainLater() {
+		t.Errorf("unexpected status check for PENDING")
+	}
+
+	errResp := &SendTransactionResponse{Status: SendStatusError}
+	if !errResp.IsError() || errResp.IsPending() || errResp.IsDuplicate() || errResp.IsTryAgainLater() {
+		t.Errorf("unexpected status check for ERROR")
+	}
+
+	dup := &SendTransactionResponse{Status: SendStatusDuplicate}
+	if !dup.IsDuplicate() || dup.IsPending() || dup.IsError() || dup.IsTryAgainLater() {
+		t.Errorf("unexpected status check for DUPLICATE")
+	}
+
+	retry := &SendTransactionResponse{Status: SendStatusTryAgainLater}
+	if !retry.IsTryAgainLater() || retry.IsPending() || retry.IsError() || retry.IsDuplicate() {
+		t.Errorf("unexpected status check for TRY_AGAIN_LATER")
+	}
+}

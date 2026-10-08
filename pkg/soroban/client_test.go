@@ -367,3 +367,35 @@ func TestCallHonoursContextCancellation(t *testing.T) {
 		t.Errorf("error %v does not wrap context.Canceled", err)
 	}
 }
+
+func TestWithHeaders(t *testing.T) {
+	var gotAuth, gotCustom string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotAuth = r.Header.Get("Authorization")
+		gotCustom = r.Header.Get("X-Custom-Header")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"jsonrpc":"2.0","id":1,"result":{"status":"healthy"}}`)
+	}))
+	t.Cleanup(srv.Close)
+
+	client, err := New(
+		WithURL(srv.URL),
+		WithHeader("Authorization", "Bearer test-token"),
+		WithHeaders(map[string]string{"X-Custom-Header": "custom-val"}),
+	)
+	if err != nil {
+		t.Fatalf("New() failed: %v", err)
+	}
+
+	_, err = client.GetHealth(context.Background())
+	if err != nil {
+		t.Fatalf("GetHealth() failed: %v", err)
+	}
+
+	if gotAuth != "Bearer test-token" {
+		t.Errorf("Authorization header = %q, want %q", gotAuth, "Bearer test-token")
+	}
+	if gotCustom != "custom-val" {
+		t.Errorf("X-Custom-Header = %q, want %q", gotCustom, "custom-val")
+	}
+}

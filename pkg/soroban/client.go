@@ -34,6 +34,7 @@ type config struct {
 	url        string
 	httpClient *http.Client
 	timeout    time.Duration
+	headers    map[string]string
 }
 
 // Option customises a Client built by New.
@@ -56,6 +57,29 @@ func WithHTTPClient(hc *http.Client) Option {
 // given. Per-call deadlines can be set with the context instead.
 func WithTimeout(d time.Duration) Option {
 	return func(c *config) { c.timeout = d }
+}
+
+// WithHeader sets an HTTP header sent on every request to the RPC endpoint,
+// such as an Authorization header for authenticated endpoints.
+func WithHeader(key, value string) Option {
+	return func(c *config) {
+		if c.headers == nil {
+			c.headers = make(map[string]string)
+		}
+		c.headers[key] = value
+	}
+}
+
+// WithHeaders sets multiple HTTP headers sent on every request to the RPC endpoint.
+func WithHeaders(headers map[string]string) Option {
+	return func(c *config) {
+		if c.headers == nil {
+			c.headers = make(map[string]string, len(headers))
+		}
+		for k, v := range headers {
+			c.headers[k] = v
+		}
+	}
 }
 
 // New returns a Client. With no options it targets TestnetURL with
@@ -86,7 +110,7 @@ func New(opts ...Option) (*Client, error) {
 		hc = &http.Client{Timeout: cfg.timeout}
 	}
 
-	return &Client{rpc: jsonrpc.NewClient(cfg.url, hc), url: cfg.url}, nil
+	return &Client{rpc: jsonrpc.NewClient(cfg.url, hc, cfg.headers), url: cfg.url}, nil
 }
 
 // Endpoint reports the RPC URL this client was built with.

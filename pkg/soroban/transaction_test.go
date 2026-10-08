@@ -3,7 +3,11 @@ package soroban
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func TestGetTransaction(t *testing.T) {
@@ -73,4 +77,73 @@ func TestGetTransactionRequiresHash(t *testing.T) {
 		t.Fatal("GetTransaction() returned nil error, want a validation failure")
 	}
 	// Error is expected, so we don't check captured request
+}
+
+func TestTransactionStatusHelpers(t *testing.T) {
+	succ := &TransactionResponse{Status: TxStatusSuccess}
+	if !succ.IsSuccess() || succ.IsFailed() || succ.IsNotFound() {
+		t.Errorf("unexpected status check for SUCCESS")
+	}
+
+	fail := &TransactionResponse{Status: TxStatusFailed}
+	if !fail.IsFailed() || fail.IsSuccess() || fail.IsNotFound() {
+		t.Errorf("unexpected status check for FAILED")
+	}
+
+	notFound := &TransactionResponse{Status: TxStatusNotFound}
+	if !notFound.IsNotFound() || notFound.IsSuccess() || notFound.IsFailed() {
+		t.Errorf("unexpected status check for NOT_FOUND")
+	}
+}
+
+func TestSendAndAwaitTransaction(t *testing.T) {
+	calls := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		var req struct {
+			ID     uint64 `json:"id"`
+			Method string `json:"method"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Errorf("decode request: %v", err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if req.Method == "sendTransaction" {
+			fmt.Fprintf(w, `{"jsonrpc":"2.0","id":%d,"result":{"status":"PENDING","hash":"abc123hash","latestLedger":100}}`, req.ID)
+			return
+		}
+		if req.Method == "getTransaction" {
+			// First poll returns NOT_FOUND, second poll returns SUCCESS
+			if calls <= 2 {
+				fmt.Fprintf(w, `{"jsonrpc":"2.0","id":%d,"result":{"status":"NOT_FOUND","latestLedger":101}}`, req.ID)
+			} else {
+				fmt.Fprintf(w, `{"jsonrpc":"2.0","id":%d,"result":{"status":"SUCCESS","latestLedger":102,"ledger":102,"resultXdr":"AAAAAQ=="}}`, req.ID)
+			}
+			return
+		}
+		t.Errorf("unexpected method: %s", req.Method)
+	}))
+	t.Cleanup(srv.Close)
+
+	client, err := New(WithURL(srv.URL))
+	if err != nil {
+		t.Fatalf("New() failed: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resp, err := client.SendAndAwaitTransaction(ctx, "AAAAtestEnvelope", 500*time.Millisecond)
+	if err != nil {
+		t.Fatalf("SendAndAwaitTransaction() failed: %v", err)
+	}
+
+	if !resp.IsSuccess() {
+		t.Errorf("status = %q, want SUCCESS", resp.Status)
+	}
+	if resp.ResultXDR != "AAAAAQ==" {
+		t.Errorf("resultXdr = %q, want AAAAAQ==", resp.ResultXDR)
+	}
 }
