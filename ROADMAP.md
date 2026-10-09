@@ -68,10 +68,10 @@ Focuses on lowering onboarding friction, providing automated release tooling, an
 - [x] **Release Engineering**:
   - Multi-platform automated releases via GoReleaser (Linux, macOS, Windows; AMD64/ARM64)
 - [ ] **Wave Contributor Tasks**:
-  - [ ] Bidirectional `ScVal` encoders (Native Go -> `xdr.ScVal`) (#WaveTask)
-  - [ ] Transaction simulation resource fee estimator & footprint analyzer (#WaveTask)
-  - [ ] Soroban contract event streaming & subscriber channels (#WaveTask)
-  - [ ] Comprehensive runnable example suites for developers (#WaveTask)
+  - [ ] [Bidirectional `ScVal` encoders (Native Go -> `xdr.ScVal`) (#34)](https://github.com/Northbound-Dev/soroban-go-toolkit/issues/34) — *150 pts*
+  - [ ] [Transaction simulation resource fee estimator & footprint analyzer (#35)](https://github.com/Northbound-Dev/soroban-go-toolkit/issues/35) — *200 pts*
+  - [ ] [Soroban contract event streaming & subscriber channels (#36)](https://github.com/Northbound-Dev/soroban-go-toolkit/issues/36) — *200 pts*
+  - [ ] [Comprehensive runnable example suites for developers (#37)](https://github.com/Northbound-Dev/soroban-go-toolkit/issues/37) — *100 pts*
 
 ---
 
