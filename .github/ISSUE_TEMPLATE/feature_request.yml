@@ -1,0 +1,32 @@
+name: "💡 Feature Request"
+description: "Suggest an idea or enhancement for soroban-go-toolkit"
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please verify if the feature is already covered in our [ROADMAP.md](https://github.com/Northbound-Dev/soroban-go-toolkit/blob/main/ROADMAP.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem or Use Case"
+      description: "Is your feature request related to a problem or new Soroban RPC capability?"
+      placeholder: "A clear and concise description of the problem or limitation..."
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: "Proposed Solution"
+      description: "Describe how you'd like this to work in Go API or CLI"
+      placeholder: "Suggested function signatures, CLI flags, or behavioral changes..."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternatives Considered"
+      description: "Any alternative solutions or features you've considered"
+    validations:
+      required: false

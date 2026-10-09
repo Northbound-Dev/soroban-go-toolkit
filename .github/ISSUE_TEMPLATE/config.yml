@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Stellar Developer Discord
+    url: https://discord.gg/stellardev
+    about: Ask questions and connect with the Stellar and Soroban developer community.
+  - name: Drips Wave Program
+    url: https://www.drips.network/wave
+    about: Learn more about contributing to open-source projects via Drips Wave.

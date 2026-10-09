@@ -1,0 +1,50 @@
+name: "🌊 Drips Wave Task"
+description: "A scoped task or feature designed for Drips Wave community contributors"
+title: "[Wave Task]: "
+labels: ["wave-task", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for picking up a task in the **Drips Wave** program!
+        Please read our [Contributing Guidelines](https://github.com/Northbound-Dev/soroban-go-toolkit/blob/main/CONTRIBUTING.md) before starting.
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: "Complexity & Points"
+      description: "Select the task complexity mapping to Drips Wave points"
+      options:
+        - "Trivial (100 Points)"
+        - "Medium (150 Points)"
+        - "High (200 Points)"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: "Task Description"
+      description: "Detailed overview of the problem, motivation, and solution"
+      placeholder: "Provide context on what needs to be implemented and why it benefits the Soroban/Go ecosystem..."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: "Acceptance Criteria"
+      description: "List of exact conditions and tests that must pass for this task to be accepted"
+      value: |
+        - [ ] Implementation in appropriate package (`pkg/soroban` or `cmd/sorobango`)
+        - [ ] Comprehensive unit tests with mocked HTTP (`net/http/httptest`), zero external network calls
+        - [ ] All linters passing (`gofmt -w .`, `go vet ./...`, `golangci-lint run`)
+        - [ ] Race detection passing (`go test -race ./...`)
+        - [ ] README.md / documentation updated (if applicable)
+    validations:
+      required: true
+  - type: textarea
+    id: files_to_touch
+    attributes:
+      label: "Suggested Files to Touch"
+      description: "Pointers to relevant files or packages for new contributors"
+      placeholder: "e.g., pkg/soroban/scval.go, cmd/sorobango/root.go"
+    validations:
+      required: false

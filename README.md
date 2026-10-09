@@ -301,7 +301,9 @@ See the [`examples/`](examples/) directory for runnable examples that you can ad
 | `simulateTransaction` | `SimulateTransaction` | `sorobango simulate` |
 | `sendTransaction` | `SendTransaction` | `sorobango send` |
 | `getTransaction` | `GetTransaction` | `sorobango get-tx` |
+| `getTransactions` | `GetTransactions` | `sorobango get-transactions` |
 | `getEvents` | `GetEvents` | `sorobango events` |
+| `getFeeStats` | `GetFeeStats` | `sorobango fee-stats` |
 | `getNetwork` | `GetNetwork` | `sorobango network` |
 | `getVersionInfo` | `GetVersionInfo` | `sorobango version` |
 
@@ -313,26 +315,64 @@ constructing XDR by hand:
 | `GetContractData` | `sorobango contract-data` | Read one value from contract storage |
 | `GetContractInstance` | `sorobango contract-instance` | Read a contract's instance entry |
 
-Note that `getContractData` is not a Stellar RPC method — it existed in early
-Soroban previews and was removed. Contract state is read via `getLedgerEntries`,
-which is what these helpers do.
+High-level workflow helper:
+
+| Helper | Purpose |
+| --- | --- |
+| `SendAndAwaitTransaction` | Submits a signed envelope and polls until confirmation or error |
+
+### Typed ScVal Decoding
+
+Working with raw Soroban XDR types can be verbose and error-prone. The toolkit provides a high-level, type-safe decoding suite in `pkg/soroban`:
+
+```go
+// Direct primitive and scalar decoding
+val, _ := soroban.DecodeU32(scVal)
+val64, _ := soroban.DecodeI64(scVal)
+sym, _ := soroban.DecodeSymbol(scVal)
+addr, _ := soroban.DecodeAddress(scVal) // Stellar G... or C... address
+
+// Exact 128-bit & 256-bit signed/unsigned integer decoding (no precision loss)
+bigInt, _ := soroban.DecodeI128(scVal) // returns *big.Int with exact 2's complement
+bigUint, _ := soroban.DecodeU256(scVal)
+
+// Complex nested data decoding
+elements, _ := soroban.DecodeVec(scVal, soroban.DecodeSymbol)
+orderedMap, _ := soroban.DecodeOrderedMap(scVal, soroban.DecodeString, soroban.DecodeI64)
+
+// Recursive native decoding to standard Go primitives/maps/slices
+nativeVal, _ := soroban.DecodeNative(scVal)
+```
 
 ## CLI
 
-Every command takes `--rpc-url`, `--timeout`, and `--json`, and exits non-zero
-on failure so it composes in scripts.
+Every command supports `--rpc-url`, `--timeout`, `--json`, and custom headers via `--header` / `-H` (e.g. for authenticated RPC providers), and exits non-zero on failure so it composes in scripts.
 
 ```sh
+# Health and network metadata
 sorobango health
-sorobango latest-ledger --json
-sorobango send - < envelope.txt
-sorobango get-tx <transaction-hash>
-sorobango events
 sorobango network
 sorobango version
-sorobango contract-data CXXX...  COUNTER --durability persistent
+sorobango latest-ledger --json
+
+# Fee stats and historical transactions
+sorobango fee-stats
+sorobango get-transactions --start-ledger 1000 --limit 10
+
+# Contract state reads
+sorobango contract-data CXXX... COUNTER --durability persistent
 sorobango contract-instance CXXX...
+
+# Contract event queries
+sorobango events --start-ledger 1000
+
+# Transaction simulation and submission
 sorobango simulate - < envelope.txt
+sorobango send - < envelope.txt
+sorobango get-tx <transaction-hash>
+
+# Using authenticated endpoints (QuickNode, Blockdaemon, etc.)
+sorobango health --rpc-url "https://my-rpc.example.com" -H "Authorization: Bearer <token>"
 ```
 
 Two failure cases are deliberately reflected in the exit code rather than only
@@ -340,11 +380,11 @@ in the output: `health` fails when the endpoint reports anything but healthy, so
 it works as a readiness probe, and `simulate` fails when the contract call
 itself fails even though the RPC call succeeded.
 
-## Not yet implemented
+## Roadmap & Community Contributions
 
-These are tracked as issues and are good places to start contributing:
+We follow an active roadmap and welcome community contributions, particularly via the **Drips Wave** program.
 
-- Typed decoding for structured `ScVal` values (maps, vectors, `i128`/`u256`)
+See [ROADMAP.md](ROADMAP.md) for current sprint priorities and future milestones, and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, point sizing, and PR requirements. Browse open tasks with the [`wave-task`](https://github.com/Northbound-Dev/soroban-go-toolkit/issues?q=is%3Aissue+is%3Aopen+label%3Awave-task) label.
 
 
 ## Troubleshooting

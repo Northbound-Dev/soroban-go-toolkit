@@ -1,0 +1,44 @@
+name: "🐛 Bug Report"
+description: "Report a bug or unexpected behavior in soroban-go-toolkit"
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "Bug Description"
+      description: "A clear and concise description of what the bug is"
+      placeholder: "When calling Client.Get..., an unexpected error occurs..."
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "Steps to Reproduce"
+      description: "Code snippet or CLI command showing how to reproduce"
+      placeholder: |
+        1. Run `sorobango ...`
+        2. Or execute Go snippet:
+        ```go
+        ...
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected Behavior"
+      description: "What did you expect to happen?"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: "Environment"
+      description: "Go version, OS, soroban-go-toolkit version, and RPC network (testnet/mainnet)"
+      value: |
+        - Go version: `go version`
+        - OS: Linux / macOS / Windows
+        - Network: Stellar Testnet / Mainnet / Local RPC
+    validations:
+      required: true
